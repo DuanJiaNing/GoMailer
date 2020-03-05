@@ -2,15 +2,20 @@ package main
 
 import (
 	"net/http"
-	"os"
 
 	"GoMailer/app"
+	"GoMailer/conf"
+	"GoMailer/handler"
 	"GoMailer/log"
 )
 
+func init() {
+	http.Handle("/api/", handler.Router)
+}
+
 func main() {
 	port := "8080"
-	if s := os.Getenv("PORT"); s != "" {
+	if s := conf.App().Port; s != "" {
 		port = s
 	}
 
@@ -20,7 +25,7 @@ func main() {
 	}
 
 	addr := host + ":" + port
-	log.Infof("server start at %s", addr)
+	log.Infof("server start at %s with env: %s", addr, conf.Env())
 	if err := http.ListenAndServe(addr, app.Handler()); err != nil {
 		log.Fatalf("http.ListenAndServe: %v", err)
 	}

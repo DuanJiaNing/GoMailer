@@ -1,0 +1,9 @@
+env: dev
+app:
+  port: 8080
+
+cors:
+  allowed-origins: '*'
+  allow-methods: POST,GET,PUT,DELETE,OPTIONS
+  allow-headers: Authorization, Content-Type, Accept-Encoding, User-Agent, Accept
+  max-age: 86400

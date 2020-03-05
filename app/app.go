@@ -1,5 +1,7 @@
 package app
 
+import "GoMailer/conf"
+
 func IsDevAppServer() bool {
-	return false
+	return conf.Env() == "dev"
 }
