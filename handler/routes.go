@@ -10,6 +10,8 @@ import (
 var (
 	Router    = mux.NewRouter()
 	APIRouter = Router.PathPrefix("/api/").Subrouter()
+
+	MailRouter = APIRouter.PathPrefix("/mail/").Subrouter()
 )
 
 func init() {

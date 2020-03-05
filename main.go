@@ -6,6 +6,7 @@ import (
 	"GoMailer/app"
 	"GoMailer/conf"
 	"GoMailer/handler"
+	_ "GoMailer/handler/mail"
 	"GoMailer/log"
 )
 
@@ -26,7 +27,7 @@ func main() {
 
 	addr := host + ":" + port
 	log.Infof("server start at %s with env: %s", addr, conf.Env())
-	if err := http.ListenAndServe(addr, app.Handler()); err != nil {
+	if err := http.ListenAndServe(addr, app.RootHandler()); err != nil {
 		log.Fatalf("http.ListenAndServe: %v", err)
 	}
 }

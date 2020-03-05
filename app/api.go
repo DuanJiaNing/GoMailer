@@ -2,6 +2,7 @@ package app
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"runtime"
@@ -9,7 +10,47 @@ import (
 	"GoMailer/log"
 )
 
-func Handler() http.HandlerFunc {
+const (
+	HeaderContentType = "Content-Type"
+
+	MimeApplicationJSON = "application/json"
+)
+
+type ServiceHandler func(http.ResponseWriter, *http.Request) (interface{}, *ServerError)
+
+type ServerError struct {
+	Error   error
+	Message string
+	Code    int
+}
+
+func (fn ServiceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	m, e := fn(w, r)
+	if e != nil {
+		log.Errorf("handler error, status code: %d, message: %s, underlying err: %v",
+			e.Code, e.Message, e.Error)
+		http.Error(w, e.Message, e.Code)
+		return
+	}
+
+	w.Header().Set(HeaderContentType, MimeApplicationJSON)
+	if err := json.NewEncoder(w).Encode(m); err != nil {
+		e := Errorf(err, "failed to write to http response")
+		log.Errorf("handler error, status code: %d, message: %s, underlying err: %v",
+			e.Code, e.Message, e.Error)
+		http.Error(w, e.Message, e.Code)
+	}
+}
+
+func Errorf(err error, format string, v ...interface{}) *ServerError {
+	return &ServerError{
+		Error:   err,
+		Message: fmt.Sprintf(format, v...),
+		Code:    500,
+	}
+}
+
+func RootHandler() http.HandlerFunc {
 	return handleHTTP
 }
 
