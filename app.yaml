@@ -7,3 +7,6 @@ cors:
   allow-methods: POST,GET,PUT,DELETE,OPTIONS
   allow-headers: Authorization, Content-Type, Accept-Encoding, User-Agent, Accept
   max-age: 86400
+
+data-source:
+  url: root:123456@tcp(127.0.0.1:3306)/gomailer
