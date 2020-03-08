@@ -16,15 +16,15 @@ const (
 	MimeApplicationJSON = "application/json"
 )
 
-type ServiceHandler func(http.ResponseWriter, *http.Request) (interface{}, *ServerError)
+type Handler func(http.ResponseWriter, *http.Request) (interface{}, *Error)
 
-type ServerError struct {
+type Error struct {
 	Error   error
 	Message string
 	Code    int
 }
 
-func (fn ServiceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (fn Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	m, e := fn(w, r)
 	if e != nil {
 		log.Errorf("handler error, status code: %d, message: %s, underlying err: %v",
@@ -42,8 +42,8 @@ func (fn ServiceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func Errorf(err error, format string, v ...interface{}) *ServerError {
-	return &ServerError{
+func Errorf(err error, format string, v ...interface{}) *Error {
+	return &Error{
 		Error:   err,
 		Message: fmt.Sprintf(format, v...),
 		Code:    500,

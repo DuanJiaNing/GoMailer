@@ -10,10 +10,10 @@ import (
 
 func init() {
 	router := handler.MailRouter.Path("/send").Subrouter()
-	router.Methods(http.MethodPost).Handler(app.ServiceHandler(send))
+	router.Methods(http.MethodPost).Handler(app.Handler(send))
 }
 
-func send(http.ResponseWriter, *http.Request) (interface{}, *app.ServerError) {
+func send(http.ResponseWriter, *http.Request) (interface{}, *app.Error) {
 	dialer := gomail.NewDialer("smtp.qq.com", 465, "2213994603@qq.com", "athupcbmeyvvdjif")
 	err := dialer.DialAndSend(getMsg())
 	if err != nil {

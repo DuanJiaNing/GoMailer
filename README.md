@@ -3,6 +3,7 @@
 <br>
 
 ### shortcut to register an endpoint for email delivery
+request body
 ```json
 {
   "username": "djn",
@@ -38,5 +39,12 @@
       "enable_re_captcha": true
     }
   }
+}
+``` 
+
+response body
+```json
+{
+  "delivery_key": "adfdsaV.sdaawerzvsdf"
 }
 ``` 
