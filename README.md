@@ -6,45 +6,48 @@
 request body
 ```json
 {
-  "username": "djn",
-  "password": "123456",
+  "user": {
+    "username": "djn",
+    "password": "123456"
+  },
   "app": {
-    "app_name": "demo",
+    "appName": "demo",
     "host": "demo.com"
   },
-  "end_point": {
+  "endPoint": {
     "name": "发送反馈",
     "dialer": {
       "host": "smtp.qq.com",
       "port": 465,
-      "auth_username": "666@qq.com",
-      "auth_password": "666aaa",
+      "authUsername": "666@qq.com",
+      "authPassword": "666aaa",
       "name": "XX公司"
     },
     "receiver": [
       {
-        "address": "djn163<duan_jia_ning@163.com>"
+        "address": "djn163<duan_jia_ning@163.com>",
+        "receiverType": "TO"
       },
       {
         "address": "djn163<foo@163.com>",
-        "receiver_type": "CC"
+        "receiverType": "CC"
       }
     ],
     "template": {
-      "content_type": "text/html",
+      "contentType": "text/html",
       "template": "<div><hr><h1>Test email{{msg}}</h1><div/>"
     },
     "preference": {
-      "deliver_strategy": "IMMEDIATELY",
-      "enable_re_captcha": true
+      "deliverStrategy": "IMMEDIATELY",
+      "enableReCaptcha": true
     }
   }
 }
-``` 
+```
 
 response body
 ```json
 {
-  "delivery_key": "adfdsaV.sdaawerzvsdf"
+  "deliveryKey": "adfdsaV.sdaawerzvsdf"
 }
 ``` 

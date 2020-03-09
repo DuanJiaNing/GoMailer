@@ -7,6 +7,7 @@ import (
 	"GoMailer/conf"
 	"GoMailer/handler"
 	_ "GoMailer/handler/mail"
+	_ "GoMailer/handler/shortcut"
 	"GoMailer/log"
 )
 

@@ -33,7 +33,7 @@ type User struct {
 	InsertTime time.Time
 
 	Username string
-	password string
+	Password string
 }
 
 type UserApp struct {
@@ -58,7 +58,7 @@ type EndPoint struct {
 	Name string
 }
 
-type EndPointConfig struct {
+type EndPointPreference struct {
 	ID         int64
 	InsertTime time.Time
 
@@ -73,6 +73,8 @@ type Receiver struct {
 	InsertTime time.Time
 
 	EndPointID int64
+	UserID int64
+	UserAppID  int64
 
 	Address      string
 	ReceiverType string
