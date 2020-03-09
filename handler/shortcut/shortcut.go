@@ -10,8 +10,12 @@ import (
 	"GoMailer/handler"
 	happ "GoMailer/handler/app"
 	"GoMailer/handler/dialer"
+	"GoMailer/handler/endpoint"
+	"GoMailer/handler/template"
 	"GoMailer/handler/user"
 )
+
+const errInvalidParameter = "invalid parameter"
 
 func init() {
 	router := handler.APIRouter.Path("/shortcut").Subrouter()
@@ -37,71 +41,232 @@ func shortcut(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) 
 		return nil, aerr
 	}
 
-	if aerr = validateParameter(vo); aerr != nil {
-		return nil, aerr
+	if vo.User == nil || vo.EndPoint == nil || vo.App == nil {
+		return nil, app.Errorf(errors.New("find nil value when validate parameter"), errInvalidParameter)
 	}
 
 	// 1. create user if not registered
-	u, err := user.GetByName(vo.User.Username)
+	// vo.User is required
+	user, err := handleUser(vo.User)
+	if err != nil {
+		return nil, err
+	}
+
+	// 2. create app for user if not created, else update it
+	// vo.App is required
+	userApp, err := handleUserApp(user, vo.App)
+	if err != nil {
+		return nil, err
+	}
+
+	// vo.EndPoint is required
+	if utils.IsStrBlank(vo.EndPoint.Name) {
+		return nil, app.Errorf(errors.New("end point name can not be empty"), errInvalidParameter)
+	}
+	// 3. check dialer exists or not for user, create dialer when not
+	dialer, err := handleUserDialer(user, vo.EndPoint.Dialer)
+	if err != nil {
+		return nil, err
+	}
+
+	// 4. create template for user
+	template, err := handleUserTemplate(user, vo.EndPoint.Template)
+	if err != nil {
+		return nil, err
+	}
+
+	// 5. create or update end point
+	endpoint, err := handleEndPoint(vo.EndPoint.Name, user, userApp, dialer, template)
+	if err != nil {
+		return nil, err
+	}
+
+	// 6. create or update preference for end point
+	_, err = handleEndPointPreference(endpoint, vo.EndPoint.Preference)
+	if err != nil {
+		return nil, err
+	}
+
+	// 7. add or update receiver for end point
+	err = handleEndPointReceiver(endpoint, user, userApp, vo.EndPoint.Receiver)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+func handleEndPointReceiver(ep *db.EndPoint, u *db.User, ua *db.UserApp, receiver []*db.Receiver) *app.Error {
+	if len(receiver) == 0 {
+		return nil
+	}
+
+	err := endpoint.DeleteReceiver(ep.ID)
+	if err != nil {
+		return app.Errorf(err, "failed to delete all receiver for end point receiver update")
+	}
+	for _, r := range receiver {
+		r.EndPointID = ep.ID
+		r.UserID = u.ID
+		r.UserAppID = ua.ID
+	}
+	err = endpoint.PatchCreateReceiver(receiver)
+	if err != nil {
+		return app.Errorf(err, "failed to create receiver for end point")
+	}
+
+	return nil
+}
+
+func handleEndPointPreference(ep *db.EndPoint, p *db.EndPointPreference) (*db.EndPointPreference, *app.Error) {
+	if p == nil {
+		return nil, nil
+	}
+
+	p.EndPointID = ep.ID
+	pre, err := endpoint.FindPreference(ep.ID)
+	if err != nil {
+		return nil, app.Errorf(err, "failed to find end point preference")
+	}
+	if pre == nil {
+		pre, err = endpoint.CreatePreference(p)
+		if err != nil {
+			return nil, app.Errorf(err, "failed to create end point preference")
+		}
+	} else {
+		p.ID = pre.ID
+		pre, err = endpoint.UpdatePreference(p)
+		if err != nil {
+			return nil, app.Errorf(err, "failed to update end point preference")
+		}
+	}
+
+	return pre, nil
+}
+
+func handleEndPoint(name string, u *db.User, ap *db.UserApp, ud *db.Dialer, ut *db.Template) (
+	*db.EndPoint, *app.Error) {
+	if utils.IsStrBlank(name) {
+		return nil, app.Errorf(errors.New("end point name can not be empty"), errInvalidParameter)
+	}
+
+	ep, err := endpoint.FindByName(name)
+	if err != nil {
+		return nil, app.Errorf(err, "failed to find end point")
+	}
+
+	nep := &db.EndPoint{}
+	nep.Name = name
+	nep.UserID = u.ID
+	nep.UserAppID = ap.ID
+	if ud != nil {
+		nep.DialerID = ud.ID
+	}
+	if ut != nil {
+		nep.TemplateID = ut.ID
+	}
+	if ep == nil {
+		if ud == nil || ut == nil {
+			return nil, app.Errorf(err, "dialer and template is required when create end point")
+		}
+		ep, err = endpoint.Create(nep)
+		if err != nil {
+			return nil, app.Errorf(err, "failed to create end point")
+		}
+	} else {
+		nep.ID = ep.ID
+		ep, err = endpoint.Update(nep)
+		if err != nil {
+			return nil, app.Errorf(err, "failed to update end point")
+		}
+	}
+
+	return ep, nil
+}
+
+func handleUserTemplate(u *db.User, t *db.Template) (*db.Template, *app.Error) {
+	if t == nil {
+		return nil, nil
+	}
+
+	t.UserID = u.ID
+	utemplate, err := template.Create(t)
+	if err != nil {
+		return nil, app.Errorf(err, "failed to create template")
+	}
+
+	return utemplate, nil
+}
+
+func handleUserDialer(u *db.User, d *db.Dialer) (*db.Dialer, *app.Error) {
+	if d == nil {
+		return nil, nil
+	}
+
+	if utils.IsStrBlank(d.Name) {
+		return nil, app.Errorf(errors.New("dialer name can not be empty"), errInvalidParameter)
+	}
+
+	d.UserID = u.ID
+	udialer, err := dialer.GetByName(d.UserID, d.Name)
+	if err != nil {
+		return nil, app.Errorf(err, "failed to get user dialer")
+	}
+	if udialer == nil {
+		udialer, err = dialer.Create(d)
+		if err != nil {
+			return nil, app.Errorf(err, "failed to create dialer")
+		}
+	} else {
+		d.ID = udialer.ID
+		udialer, err = dialer.Update(d)
+		if err != nil {
+			return nil, app.Errorf(err, "failed to update dialer")
+		}
+	}
+
+	return udialer, nil
+}
+
+func handleUserApp(u *db.User, ua *db.UserApp) (*db.UserApp, *app.Error) {
+	if ua == nil {
+		return nil, app.Errorf(errors.New("app can not be empty"), errInvalidParameter)
+	}
+	if utils.IsStrBlank(ua.AppName) {
+		return nil, app.Errorf(errors.New("app name can not be empty"), errInvalidParameter)
+	}
+
+	uapp, err := happ.GetByName(ua.AppName)
+	if err != nil {
+		return nil, app.Errorf(err, "failed to get user app")
+	}
+	if uapp == nil {
+		ua.UserID = u.ID
+		uapp, err = happ.Create(ua)
+		if err != nil {
+			return nil, app.Errorf(err, "failed to create app")
+		}
+	}
+	// User app not allowed to update here
+
+	return ua, nil
+}
+
+func handleUser(u *db.User) (*db.User, *app.Error) {
+	if utils.IsStrBlank(u.Username) || utils.IsStrBlank(u.Password) {
+		return nil, app.Errorf(errors.New("username or password can not be empty"), errInvalidParameter)
+	}
+
+	u, err := user.GetByName(u.Username)
 	if err != nil {
 		return nil, app.Errorf(err, "failed to get user")
 	}
 	if u == nil {
-		u, err = user.Create(vo.User)
+		u, err = user.Create(u)
 		if err != nil {
 			return nil, app.Errorf(err, "failed to create user")
 		}
 	}
 
-	// 2. create app for user if not created, else update it
-	uapp, err := happ.GetByName(vo.App.AppName)
-	if err != nil {
-		return nil, app.Errorf(err, "failed to get user app")
-	}
-	if uapp == nil {
-		uapp, err = happ.Create(vo.App)
-		if err != nil {
-			return nil, app.Errorf(err, "failed to create app")
-		}
-	}
-
-	// 3. check dialer exists or not for user, create dialer when not
-	udialer, err := dialer.GetByName(u.ID, vo.EndPoint.Dialer.Name)
-	if err != nil {
-		return nil, app.Errorf(err, "failed to get user dialer")
-	}
-	if udialer == nil {
-		udialer, err = dialer.Create(vo.EndPoint.Dialer)
-		if err != nil {
-			return nil, app.Errorf(err, "failed to create dialer")
-		}
-	}
-
-	// 4. create template for user
-	// 5. create or update end point
-	// 6. create or update preference for end point
-	// 7. add or update receiver for end point
-
-	return nil, nil
-}
-
-func validateParameter(vo *shortcutVO) *app.Error {
-	const errInvalidParameter = "invalid parameter"
-	if vo.User == nil || vo.EndPoint == nil || vo.App == nil {
-		return app.Errorf(errors.New("find nil value when validate parameter"), errInvalidParameter)
-	}
-	if utils.IsStrBlank(vo.User.Username) || utils.IsStrBlank(vo.User.Password) {
-		return app.Errorf(errors.New("username or password can not be empty"), errInvalidParameter)
-	}
-	if utils.IsStrBlank(vo.App.AppName) {
-		return app.Errorf(errors.New("app name can not be empty"), errInvalidParameter)
-	}
-	if utils.IsStrBlank(vo.EndPoint.Name) {
-		return app.Errorf(errors.New("end point name can not be empty"), errInvalidParameter)
-	}
-	if vo.EndPoint.Dialer != nil && utils.IsStrBlank(vo.EndPoint.Dialer.Name) {
-		return app.Errorf(errors.New("dialer name can not be empty"), errInvalidParameter)
-	}
-
-	return nil
+	return u, nil
 }

@@ -7,5 +7,7 @@ func GetByName(name string) (*db.UserApp, error) {
 }
 
 func Create(a *db.UserApp) (*db.UserApp, error) {
+	// TODO verify must-set-field here
+
 	return nil, nil
 }
