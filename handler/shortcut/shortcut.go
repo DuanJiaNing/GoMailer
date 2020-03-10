@@ -8,18 +8,19 @@ import (
 	"GoMailer/common/db"
 	"GoMailer/common/utils"
 	"GoMailer/handler"
-	happ "GoMailer/handler/app"
 	"GoMailer/handler/dialer"
 	"GoMailer/handler/endpoint"
+	"GoMailer/handler/endpoint/preference"
+	"GoMailer/handler/endpoint/receiver"
 	"GoMailer/handler/template"
 	"GoMailer/handler/user"
+	"GoMailer/handler/userapp"
 )
 
 const errInvalidParameter = "invalid parameter"
 
 func init() {
-	router := handler.APIRouter.Path("/shortcut").Subrouter()
-	router.Methods(http.MethodPost).Handler(app.Handler(shortcut))
+	handler.ShortcutRouter.Methods(http.MethodPost).Handler(app.Handler(shortcut))
 }
 
 type shortcutVO struct {
@@ -34,6 +35,14 @@ type shortcutVO struct {
 	}
 }
 
+// shortcut is a short way to create or update a end point
+// 1. create user if not registered - required
+// 2. create app for user if not created, else update it - required
+// 3. check dialer exists or not for user, create dialer when not, update when exists
+// 4. create template for user
+// 5. create or update end point - required
+// 6. create or update preference for end point
+// 7. add or update receiver for end point
 func shortcut(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) {
 	vo := &shortcutVO{}
 	aerr := app.JsonUnmarshalFromRequest(r, vo)
@@ -76,6 +85,7 @@ func shortcut(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) 
 	}
 
 	// 5. create or update end point
+	// vo.EndPoint is required
 	endpoint, err := handleEndPoint(vo.EndPoint.Name, user, userApp, dialer, template)
 	if err != nil {
 		return nil, err
@@ -96,21 +106,21 @@ func shortcut(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) 
 	return nil, nil
 }
 
-func handleEndPointReceiver(ep *db.EndPoint, u *db.User, ua *db.UserApp, receiver []*db.Receiver) *app.Error {
-	if len(receiver) == 0 {
+func handleEndPointReceiver(ep *db.EndPoint, u *db.User, ua *db.UserApp, r []*db.Receiver) *app.Error {
+	if len(r) == 0 {
 		return nil
 	}
 
-	err := endpoint.DeleteReceiver(ep.ID)
+	err := receiver.Delete(ep.ID)
 	if err != nil {
 		return app.Errorf(err, "failed to delete all receiver for end point receiver update")
 	}
-	for _, r := range receiver {
+	for _, r := range r {
 		r.EndPointID = ep.ID
 		r.UserID = u.ID
 		r.UserAppID = ua.ID
 	}
-	err = endpoint.PatchCreateReceiver(receiver)
+	err = receiver.PatchCreate(r)
 	if err != nil {
 		return app.Errorf(err, "failed to create receiver for end point")
 	}
@@ -124,18 +134,18 @@ func handleEndPointPreference(ep *db.EndPoint, p *db.EndPointPreference) (*db.En
 	}
 
 	p.EndPointID = ep.ID
-	pre, err := endpoint.FindPreference(ep.ID)
+	pre, err := preference.Find(ep.ID)
 	if err != nil {
 		return nil, app.Errorf(err, "failed to find end point preference")
 	}
 	if pre == nil {
-		pre, err = endpoint.CreatePreference(p)
+		pre, err = preference.Create(p)
 		if err != nil {
 			return nil, app.Errorf(err, "failed to create end point preference")
 		}
 	} else {
 		p.ID = pre.ID
-		pre, err = endpoint.UpdatePreference(p)
+		pre, err = preference.Update(p)
 		if err != nil {
 			return nil, app.Errorf(err, "failed to update end point preference")
 		}
@@ -235,21 +245,26 @@ func handleUserApp(u *db.User, ua *db.UserApp) (*db.UserApp, *app.Error) {
 	if utils.IsStrBlank(ua.AppName) {
 		return nil, app.Errorf(errors.New("app name can not be empty"), errInvalidParameter)
 	}
+	ua.UserID = u.ID
 
-	uapp, err := happ.GetByName(ua.AppName)
+	uapp, err := userapp.GetByName(ua.UserID, ua.AppName)
 	if err != nil {
 		return nil, app.Errorf(err, "failed to get user app")
 	}
 	if uapp == nil {
-		ua.UserID = u.ID
-		uapp, err = happ.Create(ua)
+		uapp, err = userapp.Create(ua)
 		if err != nil {
 			return nil, app.Errorf(err, "failed to create app")
 		}
+	} else {
+		ua.ID = uapp.ID
+		uapp, err = userapp.Update(ua)
+		if err != nil {
+			return nil, app.Errorf(err, "failed to update app")
+		}
 	}
-	// User app not allowed to update here
 
-	return ua, nil
+	return uapp, nil
 }
 
 func handleUser(u *db.User) (*db.User, *app.Error) {
