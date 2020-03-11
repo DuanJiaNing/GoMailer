@@ -242,12 +242,12 @@ func handleUserApp(u *db.User, ua *db.UserApp) (*db.UserApp, *app.Error) {
 	if ua == nil {
 		return nil, app.Errorf(errors.New("app can not be empty"), errInvalidParameter)
 	}
-	if utils.IsStrBlank(ua.AppName) {
+	if utils.IsStrBlank(ua.Name) {
 		return nil, app.Errorf(errors.New("app name can not be empty"), errInvalidParameter)
 	}
 	ua.UserID = u.ID
 
-	uapp, err := userapp.GetByName(ua.UserID, ua.AppName)
+	uapp, err := userapp.GetByName(ua.UserID, ua.Name)
 	if err != nil {
 		return nil, app.Errorf(err, "failed to get user app")
 	}

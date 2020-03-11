@@ -42,8 +42,8 @@ type UserApp struct {
 
 	UserID int64
 
-	AppName string
-	Host    string
+	Name string
+	Host string
 }
 
 type EndPoint struct {
@@ -73,7 +73,7 @@ type Receiver struct {
 	InsertTime time.Time
 
 	EndPointID int64
-	UserID int64
+	UserID     int64
 	UserAppID  int64
 
 	Address      string
