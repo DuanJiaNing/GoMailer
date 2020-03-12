@@ -26,23 +26,23 @@ func init() {
 type shortcutVO struct {
 	User     *db.User
 	App      *db.UserApp
-	EndPoint *struct {
+	Endpoint *struct {
 		Name       string
 		Dialer     *db.Dialer
 		Receiver   []*db.Receiver
 		Template   *db.Template
-		Preference *db.EndPointPreference
+		Preference *db.EndpointPreference
 	}
 }
 
-// shortcut is a short way to create or update a end point
+// shortcut is a short way to create or update a endpoint
 // 1. create user if not registered - required
 // 2. create app for user if not created, else update it - required
 // 3. check dialer exists or not for user, create dialer when not, update when exists
 // 4. create template for user
-// 5. create or update end point - required
-// 6. create or update preference for end point
-// 7. add or update receiver for end point
+// 5. create or update endpoint - required
+// 6. create or update preference for endpoint
+// 7. add or update receiver for endpoint
 func shortcut(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) {
 	vo := &shortcutVO{}
 	aerr := app.JsonUnmarshalFromRequest(r, vo)
@@ -50,7 +50,7 @@ func shortcut(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) 
 		return nil, aerr
 	}
 
-	if vo.User == nil || vo.EndPoint == nil || vo.App == nil {
+	if vo.User == nil || vo.Endpoint == nil || vo.App == nil {
 		return nil, app.Errorf(errors.New("find nil value when validate parameter"), errInvalidParameter)
 	}
 
@@ -68,37 +68,37 @@ func shortcut(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) 
 		return nil, err
 	}
 
-	// vo.EndPoint is required
-	if utils.IsStrBlank(vo.EndPoint.Name) {
-		return nil, app.Errorf(errors.New("end point name can not be empty"), errInvalidParameter)
+	// vo.Endpoint is required
+	if utils.IsStrBlank(vo.Endpoint.Name) {
+		return nil, app.Errorf(errors.New("endpoint name can not be empty"), errInvalidParameter)
 	}
 	// 3. check dialer exists or not for user, create dialer when not
-	dialer, err := handleUserDialer(user, vo.EndPoint.Dialer)
+	dialer, err := handleUserDialer(user, vo.Endpoint.Dialer)
 	if err != nil {
 		return nil, err
 	}
 
 	// 4. create template for user
-	template, err := handleUserTemplate(user, vo.EndPoint.Template)
+	template, err := handleUserTemplate(user, vo.Endpoint.Template)
 	if err != nil {
 		return nil, err
 	}
 
-	// 5. create or update end point
-	// vo.EndPoint is required
-	endpoint, err := handleEndPoint(vo.EndPoint.Name, user, userApp, dialer, template)
+	// 5. create or update endpoint
+	// vo.Endpoint is required
+	endpoint, err := handleEndpoint(vo.Endpoint.Name, user, userApp, dialer, template)
 	if err != nil {
 		return nil, err
 	}
 
-	// 6. create or update preference for end point
-	_, err = handleEndPointPreference(endpoint, vo.EndPoint.Preference)
+	// 6. create or update preference for endpoint
+	_, err = handleEndPointPreference(endpoint, vo.Endpoint.Preference)
 	if err != nil {
 		return nil, err
 	}
 
-	// 7. add or update receiver for end point
-	err = handleEndPointReceiver(endpoint, user, userApp, vo.EndPoint.Receiver)
+	// 7. add or update receiver for endpoint
+	err = handleEndPointReceiver(endpoint, user, userApp, vo.Endpoint.Receiver)
 	if err != nil {
 		return nil, err
 	}
@@ -106,88 +106,88 @@ func shortcut(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) 
 	return nil, nil
 }
 
-func handleEndPointReceiver(ep *db.EndPoint, u *db.User, ua *db.UserApp, r []*db.Receiver) *app.Error {
+func handleEndPointReceiver(ep *db.Endpoint, u *db.User, ua *db.UserApp, r []*db.Receiver) *app.Error {
 	if len(r) == 0 {
 		return nil
 	}
 
-	err := receiver.Delete(ep.ID)
+	err := receiver.DeleteByEndpoint(ep.Id)
 	if err != nil {
-		return app.Errorf(err, "failed to delete all receiver for end point receiver update")
+		return app.Errorf(err, "failed to delete all receiver for endpoint receiver update")
 	}
 	for _, r := range r {
-		r.EndPointID = ep.ID
-		r.UserID = u.ID
-		r.UserAppID = ua.ID
+		r.EndpointId = ep.Id
+		r.UserId = u.Id
+		r.UserAppId = ua.Id
 	}
 	err = receiver.PatchCreate(r)
 	if err != nil {
-		return app.Errorf(err, "failed to create receiver for end point")
+		return app.Errorf(err, "failed to create receiver for endpoint")
 	}
 
 	return nil
 }
 
-func handleEndPointPreference(ep *db.EndPoint, p *db.EndPointPreference) (*db.EndPointPreference, *app.Error) {
+func handleEndPointPreference(ep *db.Endpoint, p *db.EndpointPreference) (*db.EndpointPreference, *app.Error) {
 	if p == nil {
 		return nil, nil
 	}
 
-	p.EndPointID = ep.ID
-	pre, err := preference.Find(ep.ID)
+	p.EndpointId = ep.Id
+	pre, err := preference.FindByEndpoint(ep.Id)
 	if err != nil {
-		return nil, app.Errorf(err, "failed to find end point preference")
+		return nil, app.Errorf(err, "failed to find endpoint preference")
 	}
 	if pre == nil {
 		pre, err = preference.Create(p)
 		if err != nil {
-			return nil, app.Errorf(err, "failed to create end point preference")
+			return nil, app.Errorf(err, "failed to create endpoint preference")
 		}
 	} else {
-		p.ID = pre.ID
+		p.Id = pre.Id
 		pre, err = preference.Update(p)
 		if err != nil {
-			return nil, app.Errorf(err, "failed to update end point preference")
+			return nil, app.Errorf(err, "failed to update endpoint preference")
 		}
 	}
 
 	return pre, nil
 }
 
-func handleEndPoint(name string, u *db.User, ap *db.UserApp, ud *db.Dialer, ut *db.Template) (
-	*db.EndPoint, *app.Error) {
+func handleEndpoint(name string, u *db.User, ap *db.UserApp, ud *db.Dialer, ut *db.Template) (
+	*db.Endpoint, *app.Error) {
 	if utils.IsStrBlank(name) {
-		return nil, app.Errorf(errors.New("end point name can not be empty"), errInvalidParameter)
+		return nil, app.Errorf(errors.New("endpoint name can not be empty"), errInvalidParameter)
 	}
 
-	ep, err := endpoint.FindByName(name)
+	ep, err := endpoint.FindByName(ap.Id, name)
 	if err != nil {
-		return nil, app.Errorf(err, "failed to find end point")
+		return nil, app.Errorf(err, "failed to find endpoint")
 	}
 
-	nep := &db.EndPoint{}
+	nep := &db.Endpoint{}
 	nep.Name = name
-	nep.UserID = u.ID
-	nep.UserAppID = ap.ID
+	nep.UserId = u.Id
+	nep.UserAppId = ap.Id
 	if ud != nil {
-		nep.DialerID = ud.ID
+		nep.DialerId = ud.Id
 	}
 	if ut != nil {
-		nep.TemplateID = ut.ID
+		nep.TemplateId = ut.Id
 	}
 	if ep == nil {
 		if ud == nil || ut == nil {
-			return nil, app.Errorf(err, "dialer and template is required when create end point")
+			return nil, app.Errorf(err, "dialer and template is required when create endpoint")
 		}
 		ep, err = endpoint.Create(nep)
 		if err != nil {
-			return nil, app.Errorf(err, "failed to create end point")
+			return nil, app.Errorf(err, "failed to create endpoint")
 		}
 	} else {
-		nep.ID = ep.ID
+		nep.Id = ep.Id
 		ep, err = endpoint.Update(nep)
 		if err != nil {
-			return nil, app.Errorf(err, "failed to update end point")
+			return nil, app.Errorf(err, "failed to update endpoint")
 		}
 	}
 
@@ -199,7 +199,7 @@ func handleUserTemplate(u *db.User, t *db.Template) (*db.Template, *app.Error) {
 		return nil, nil
 	}
 
-	t.UserID = u.ID
+	t.UserId = u.Id
 	utemplate, err := template.Create(t)
 	if err != nil {
 		return nil, app.Errorf(err, "failed to create template")
@@ -217,8 +217,8 @@ func handleUserDialer(u *db.User, d *db.Dialer) (*db.Dialer, *app.Error) {
 		return nil, app.Errorf(errors.New("dialer name can not be empty"), errInvalidParameter)
 	}
 
-	d.UserID = u.ID
-	udialer, err := dialer.GetByName(d.UserID, d.Name)
+	d.UserId = u.Id
+	udialer, err := dialer.FindByName(d.UserId, d.Name)
 	if err != nil {
 		return nil, app.Errorf(err, "failed to get user dialer")
 	}
@@ -228,7 +228,7 @@ func handleUserDialer(u *db.User, d *db.Dialer) (*db.Dialer, *app.Error) {
 			return nil, app.Errorf(err, "failed to create dialer")
 		}
 	} else {
-		d.ID = udialer.ID
+		d.Id = udialer.Id
 		udialer, err = dialer.Update(d)
 		if err != nil {
 			return nil, app.Errorf(err, "failed to update dialer")
@@ -245,9 +245,9 @@ func handleUserApp(u *db.User, ua *db.UserApp) (*db.UserApp, *app.Error) {
 	if utils.IsStrBlank(ua.Name) {
 		return nil, app.Errorf(errors.New("app name can not be empty"), errInvalidParameter)
 	}
-	ua.UserID = u.ID
+	ua.UserId = u.Id
 
-	uapp, err := userapp.GetByName(ua.UserID, ua.Name)
+	uapp, err := userapp.FindByName(ua.UserId, ua.Name)
 	if err != nil {
 		return nil, app.Errorf(err, "failed to get user app")
 	}
@@ -257,7 +257,7 @@ func handleUserApp(u *db.User, ua *db.UserApp) (*db.UserApp, *app.Error) {
 			return nil, app.Errorf(err, "failed to create app")
 		}
 	} else {
-		ua.ID = uapp.ID
+		ua.Id = uapp.Id
 		uapp, err = userapp.Update(ua)
 		if err != nil {
 			return nil, app.Errorf(err, "failed to update app")
@@ -272,16 +272,16 @@ func handleUser(u *db.User) (*db.User, *app.Error) {
 		return nil, app.Errorf(errors.New("username or password can not be empty"), errInvalidParameter)
 	}
 
-	u, err := user.GetByName(u.Username)
+	us, err := user.FindByName(u.Username)
 	if err != nil {
 		return nil, app.Errorf(err, "failed to get user")
 	}
-	if u == nil {
-		u, err = user.Create(u)
+	if us == nil {
+		us, err = user.Create(u)
 		if err != nil {
 			return nil, app.Errorf(err, "failed to create user")
 		}
 	}
 
-	return u, nil
+	return us, nil
 }

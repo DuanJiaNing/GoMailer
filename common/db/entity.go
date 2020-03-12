@@ -1,7 +1,6 @@
 package db
 
 import (
-	"errors"
 	"time"
 )
 
@@ -29,62 +28,62 @@ var (
 )
 
 type User struct {
-	ID         int64
-	InsertTime time.Time
+	Id         int64
+	InsertTime time.Time `xorm:"created"`
 
 	Username string
 	Password string
 }
 
 type UserApp struct {
-	ID         int64
-	InsertTime time.Time
+	Id         int64
+	InsertTime time.Time `xorm:"created"`
 
-	UserID int64
+	UserId int64
 
 	Name string
 	Host string
 }
 
-type EndPoint struct {
-	ID         int64
-	InsertTime time.Time
+type Endpoint struct {
+	Id         int64
+	InsertTime time.Time `xorm:"created"`
 
-	UserAppID  int64
-	DialerID   int64
-	TemplateID int64
-	UserID     int64
+	UserAppId  int64
+	DialerId   int64
+	TemplateId int64
+	UserId     int64
 
 	Name string
 }
 
-type EndPointPreference struct {
-	ID         int64
-	InsertTime time.Time
+type EndpointPreference struct {
+	Id         int64
+	InsertTime time.Time `xorm:"created"`
 
-	EndPointID int64
+	EndpointId int64
 
 	DeliverStrategy string
-	EnableReCaptcha bool
+	EnableReCaptcha int32 // 1 enable 2 disable
 }
 
 type Receiver struct {
-	ID         int64
-	InsertTime time.Time
+	Id         int64
+	InsertTime time.Time `xorm:"created"`
 
-	EndPointID int64
-	UserID     int64
-	UserAppID  int64
+	EndpointId int64
+	UserId     int64
+	UserAppId  int64
 
 	Address      string
 	ReceiverType string
 }
 
 type Dialer struct {
-	ID         int64
-	InsertTime time.Time
+	Id         int64
+	InsertTime time.Time `xorm:"created"`
 
-	UserID int64
+	UserId int64
 
 	Host         string
 	Port         int32
@@ -95,53 +94,53 @@ type Dialer struct {
 }
 
 type Template struct {
-	ID         int64
-	InsertTime time.Time
+	Id         int64
+	InsertTime time.Time `xorm:"created"`
 
-	UserID int64
+	UserId int64
 
 	Template    string
 	ContentType string
 }
 
 type Mail struct {
-	ID         int64
-	InsertTime time.Time
+	Id         int64
+	InsertTime time.Time `xorm:"created"`
 
-	EndPointID   int64
+	EndpointId   int64
 	State        string
 	DeliveryTime time.Time
 	Content      string
 }
 
-func ReceiverType(name string) (receiverType, error) {
+func ReceiverType(name string) receiverType {
 	for _, n := range receiverTypeName {
 		if name == n {
-			return receiverType(name), nil
+			return receiverType(name)
 		}
 	}
 
-	return "", errors.New("receiver type illegal")
+	return ""
 }
 
-func DeliverStrategy(name string) (deliverStrategy, error) {
+func DeliverStrategy(name string) deliverStrategy {
 	for _, n := range deliverStrategyName {
 		if name == n {
-			return deliverStrategy(name), nil
+			return deliverStrategy(name)
 		}
 	}
 
-	return "", errors.New("deliver strategy illegal")
+	return ""
 }
 
-func MailState(name string) (mailState, error) {
+func MailState(name string) mailState {
 	for _, n := range mailStateName {
 		if name == n {
-			return mailState(name), nil
+			return mailState(name)
 		}
 	}
 
-	return "", errors.New("mail state illegal")
+	return ""
 }
 
 func (r receiverType) Name() string {

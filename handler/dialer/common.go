@@ -1,16 +1,98 @@
 package dialer
 
-import "GoMailer/common/db"
+import (
+	"errors"
 
-func GetByName(userID int64, name string) (*db.Dialer, error) {
-	return nil, nil
+	"GoMailer/common/db"
+	"GoMailer/common/utils"
+)
+
+func FindByName(userId int64, name string) (*db.Dialer, error) {
+	if utils.IsStrBlank(name) {
+		return nil, nil
+	}
+
+	client, err := db.NewClient()
+	if err != nil {
+		return nil, err
+	}
+
+	u := &db.Dialer{}
+	has, err := client.Where("name = ? AND user_id = ?", name, userId).Get(u)
+	if err != nil {
+		return nil, err
+	}
+	if !has {
+		return nil, nil
+	}
+
+	return u, nil
 }
 
-func Create(d *db.Dialer) (*db.Dialer,error) {
-	// TODO verify must-set-field here
-	return nil, nil
+func Create(d *db.Dialer) (*db.Dialer, error) {
+	if utils.IsStrBlank(d.Name) {
+		return nil, errors.New("name can not be empty")
+	}
+	if utils.IsStrBlank(d.Host) {
+		return nil, errors.New("host can not be empty")
+	}
+	if utils.IsStrBlank(d.AuthPassword) {
+		return nil, errors.New("auth password can not be empty")
+	}
+	if utils.IsStrBlank(d.AuthUsername) {
+		return nil, errors.New("auth username can not be empty")
+	}
+	if d.Port <= 0 {
+		return nil, errors.New("port invalid")
+	}
+
+	client, err := db.NewClient()
+	if err != nil {
+		return nil, err
+	}
+
+	userExist, err := client.ID(d.UserId).Exist(&db.User{})
+	if err != nil {
+		return nil, err
+	}
+	if !userExist {
+		return nil, errors.New("user not exist")
+	}
+
+	affected, err := client.InsertOne(d)
+	if err != nil {
+		return nil, err
+	}
+	if affected != 1 {
+		return nil, errors.New("failed to InsertOne dialer")
+	}
+
+	return d, nil
 }
 
-func Update(d *db.Dialer) (*db.Dialer,error) {
-	return nil, nil
+func Update(d *db.Dialer) (*db.Dialer, error) {
+	if d.Port < 0 {
+		return nil, errors.New("port invalid")
+	}
+
+	client, err := db.NewClient()
+	if err != nil {
+		return nil, err
+	}
+
+	if d.UserId != 0 {
+		userExist, err := client.ID(d.UserId).Exist(&db.User{})
+		if err != nil {
+			return nil, err
+		}
+		if !userExist {
+			return nil, errors.New("user not exist")
+		}
+	}
+
+	_, err = client.ID(d.Id).Update(d)
+	if err != nil {
+		return nil, err
+	}
+	return d, nil
 }
