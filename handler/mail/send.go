@@ -1,10 +1,12 @@
 package mail
 
 import (
-	"gopkg.in/gomail.v2"
 	"net/http"
 
+	"gopkg.in/gomail.v2"
+
 	"GoMailer/app"
+	"GoMailer/common/key"
 	"GoMailer/handler"
 )
 
@@ -13,7 +15,12 @@ func init() {
 	router.Methods(http.MethodPost).Handler(app.Handler(send))
 }
 
-func send(http.ResponseWriter, *http.Request) (interface{}, *app.Error) {
+func send(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) {
+	ak, _ := key.AppKeyFromRequest(r)
+	return ak, nil
+}
+
+func send1(http.ResponseWriter, *http.Request) (interface{}, *app.Error) {
 	dialer := gomail.NewDialer("smtp.qq.com", 465, "2213994603@qq.com", "athupcbmeyvvdjif")
 	err := dialer.DialAndSend(getMsg())
 	if err != nil {

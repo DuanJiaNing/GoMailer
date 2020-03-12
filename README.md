@@ -48,6 +48,6 @@ request body
 response body
 ```json
 {
-  "deliveryKey": "adfdsaV.sdaawerzvsdf"
+  "AppKey": "MToxOmRlbW86MTU4NDAwMTI2NDY4NTQ3MjYwMA"
 }
 ``` 

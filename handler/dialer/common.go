@@ -8,7 +8,7 @@ import (
 )
 
 func FindByName(userId int64, name string) (*db.Dialer, error) {
-	if utils.IsStrBlank(name) {
+	if utils.IsBlankStr(name) {
 		return nil, nil
 	}
 
@@ -30,16 +30,16 @@ func FindByName(userId int64, name string) (*db.Dialer, error) {
 }
 
 func Create(d *db.Dialer) (*db.Dialer, error) {
-	if utils.IsStrBlank(d.Name) {
+	if utils.IsBlankStr(d.Name) {
 		return nil, errors.New("name can not be empty")
 	}
-	if utils.IsStrBlank(d.Host) {
+	if utils.IsBlankStr(d.Host) {
 		return nil, errors.New("host can not be empty")
 	}
-	if utils.IsStrBlank(d.AuthPassword) {
+	if utils.IsBlankStr(d.AuthPassword) {
 		return nil, errors.New("auth password can not be empty")
 	}
-	if utils.IsStrBlank(d.AuthUsername) {
+	if utils.IsBlankStr(d.AuthUsername) {
 		return nil, errors.New("auth username can not be empty")
 	}
 	if d.Port <= 0 {

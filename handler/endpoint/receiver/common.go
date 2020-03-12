@@ -48,7 +48,7 @@ func PatchCreate(receiver []*db.Receiver) error {
 		if !endpointExist {
 			return errors.New("endpoint not exist")
 		}
-		if utils.IsStrBlank(r.Address) {
+		if utils.IsBlankStr(r.Address) {
 			return errors.New("address can not be empty")
 		}
 		if db.ReceiverType(r.ReceiverType) == "" {

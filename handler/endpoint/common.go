@@ -8,7 +8,7 @@ import (
 )
 
 func FindByName(appId int64, name string) (*db.Endpoint, error) {
-	if utils.IsStrBlank(name) {
+	if utils.IsBlankStr(name) {
 		return nil, nil
 	}
 
@@ -30,7 +30,7 @@ func FindByName(appId int64, name string) (*db.Endpoint, error) {
 }
 
 func Create(ep *db.Endpoint) (*db.Endpoint, error) {
-	if utils.IsStrBlank(ep.Name) {
+	if utils.IsBlankStr(ep.Name) {
 		return nil, errors.New("name can not be empty")
 	}
 

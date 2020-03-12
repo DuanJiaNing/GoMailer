@@ -26,7 +26,7 @@ func FindByEndpoint(endpointId int64) (*db.EndpointPreference, error) {
 }
 
 func Create(p *db.EndpointPreference) (*db.EndpointPreference, error) {
-	if !utils.IsStrBlank(p.DeliverStrategy) && db.DeliverStrategy(p.DeliverStrategy) == "" {
+	if !utils.IsBlankStr(p.DeliverStrategy) && db.DeliverStrategy(p.DeliverStrategy) == "" {
 		return nil, errors.New("deliver strategy illegal")
 	}
 
@@ -55,7 +55,7 @@ func Create(p *db.EndpointPreference) (*db.EndpointPreference, error) {
 }
 
 func Update(p *db.EndpointPreference) (*db.EndpointPreference, error) {
-	if !utils.IsStrBlank(p.DeliverStrategy) && db.DeliverStrategy(p.DeliverStrategy) == "" {
+	if !utils.IsBlankStr(p.DeliverStrategy) && db.DeliverStrategy(p.DeliverStrategy) == "" {
 		return nil, errors.New("deliver strategy illegal")
 	}
 

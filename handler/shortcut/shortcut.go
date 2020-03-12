@@ -6,6 +6,7 @@ import (
 
 	"GoMailer/app"
 	"GoMailer/common/db"
+	"GoMailer/common/key"
 	"GoMailer/common/utils"
 	"GoMailer/handler"
 	"GoMailer/handler/dialer"
@@ -69,7 +70,7 @@ func shortcut(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) 
 	}
 
 	// vo.Endpoint is required
-	if utils.IsStrBlank(vo.Endpoint.Name) {
+	if utils.IsBlankStr(vo.Endpoint.Name) {
 		return nil, app.Errorf(errors.New("endpoint name can not be empty"), errInvalidParameter)
 	}
 	// 3. check dialer exists or not for user, create dialer when not
@@ -103,7 +104,9 @@ func shortcut(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) 
 		return nil, err
 	}
 
-	return nil, nil
+	return struct {
+		AppKey string
+	}{AppKey: key.EncodeAppKey(user.Id, userApp.Id, endpoint.Id)}, nil
 }
 
 func handleEndPointReceiver(ep *db.Endpoint, u *db.User, ua *db.UserApp, r []*db.Receiver) *app.Error {
@@ -156,7 +159,7 @@ func handleEndPointPreference(ep *db.Endpoint, p *db.EndpointPreference) (*db.En
 
 func handleEndpoint(name string, u *db.User, ap *db.UserApp, ud *db.Dialer, ut *db.Template) (
 	*db.Endpoint, *app.Error) {
-	if utils.IsStrBlank(name) {
+	if utils.IsBlankStr(name) {
 		return nil, app.Errorf(errors.New("endpoint name can not be empty"), errInvalidParameter)
 	}
 
@@ -213,7 +216,7 @@ func handleUserDialer(u *db.User, d *db.Dialer) (*db.Dialer, *app.Error) {
 		return nil, nil
 	}
 
-	if utils.IsStrBlank(d.Name) {
+	if utils.IsBlankStr(d.Name) {
 		return nil, app.Errorf(errors.New("dialer name can not be empty"), errInvalidParameter)
 	}
 
@@ -242,7 +245,7 @@ func handleUserApp(u *db.User, ua *db.UserApp) (*db.UserApp, *app.Error) {
 	if ua == nil {
 		return nil, app.Errorf(errors.New("app can not be empty"), errInvalidParameter)
 	}
-	if utils.IsStrBlank(ua.Name) {
+	if utils.IsBlankStr(ua.Name) {
 		return nil, app.Errorf(errors.New("app name can not be empty"), errInvalidParameter)
 	}
 	ua.UserId = u.Id
@@ -268,7 +271,7 @@ func handleUserApp(u *db.User, ua *db.UserApp) (*db.UserApp, *app.Error) {
 }
 
 func handleUser(u *db.User) (*db.User, *app.Error) {
-	if utils.IsStrBlank(u.Username) || utils.IsStrBlank(u.Password) {
+	if utils.IsBlankStr(u.Username) || utils.IsBlankStr(u.Password) {
 		return nil, app.Errorf(errors.New("username or password can not be empty"), errInvalidParameter)
 	}
 

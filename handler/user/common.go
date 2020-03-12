@@ -8,7 +8,7 @@ import (
 )
 
 func FindByName(username string) (*db.User, error) {
-	if utils.IsStrBlank(username) {
+	if utils.IsBlankStr(username) {
 		return nil, nil
 	}
 
@@ -30,10 +30,10 @@ func FindByName(username string) (*db.User, error) {
 }
 
 func Create(user *db.User) (*db.User, error) {
-	if utils.IsStrBlank(user.Username) {
+	if utils.IsBlankStr(user.Username) {
 		return nil, errors.New("username can not be empty")
 	}
-	if utils.IsStrBlank(user.Password) || len(user.Password) < 6 {
+	if utils.IsBlankStr(user.Password) || len(user.Password) < 6 {
 		return nil, errors.New("password invalid, min length is 6")
 	}
 

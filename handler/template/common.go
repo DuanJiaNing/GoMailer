@@ -8,7 +8,7 @@ import (
 )
 
 func Create(t *db.Template) (*db.Template, error) {
-	if utils.IsStrBlank(t.Template) {
+	if utils.IsBlankStr(t.Template) {
 		return nil, errors.New("template can not be empty")
 	}
 

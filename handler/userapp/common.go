@@ -7,8 +7,26 @@ import (
 	"GoMailer/common/utils"
 )
 
+func FindById(appId int64) (*db.UserApp, error) {
+	client, err := db.NewClient()
+	if err != nil {
+		return nil, err
+	}
+
+	app := &db.UserApp{}
+	has, err := client.Id(appId).Get(app)
+	if err != nil {
+		return nil, err
+	}
+	if !has {
+		return nil, errors.New("app not exist")
+	}
+
+	return app, nil
+}
+
 func FindByName(userId int64, name string) (*db.UserApp, error) {
-	if utils.IsStrBlank(name) {
+	if utils.IsBlankStr(name) {
 		return nil, nil
 	}
 
@@ -30,7 +48,7 @@ func FindByName(userId int64, name string) (*db.UserApp, error) {
 }
 
 func Create(ua *db.UserApp) (*db.UserApp, error) {
-	if utils.IsStrBlank(ua.Name) {
+	if utils.IsBlankStr(ua.Name) {
 		return nil, errors.New("name can not be empty")
 	}
 
