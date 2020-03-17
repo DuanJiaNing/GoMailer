@@ -1,0 +1,42 @@
+{
+  "user": {
+    "username": "djn",
+    "password": "123456"
+  },
+  "app": {
+    "name": "demo",
+    "host": "demo.com"
+  },
+  "endpoint": {
+    "name": "用户反馈",
+    "dialer": {
+      "host": "smtp.qq.com",
+      "port": 465,
+      "authUsername": "2213994603@qq.com",
+      "authPassword": "athupcbmeyvvdjif",
+      "name": "DuanJiaNing公司"
+    },
+    "receiver": [
+      {
+        "address": "TO_djn<duan_jia_ning@163.com>",
+        "receiverType": "To"
+      },
+      {
+        "address": "CC_djn<duanjianing0@gmail.com>",
+        "receiverType": "Cc"
+      },
+      {
+        "address": "BCC_djn<aimeimeits@gmail.com>",
+        "receiverType": "Bcc"
+      }
+    ],
+    "template": {
+      "contentType": "text/html",
+      "template": "<div><hr><h1>Test email: {{msg}}</h1><div/>"
+    },
+    "preference": {
+      "deliverStrategy": "DELIVER_IMMEDIATELY",
+      "enableReCaptcha": 2
+    }
+  }
+}

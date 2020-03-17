@@ -8,6 +8,19 @@ type deliverStrategy string
 type receiverType string
 type mailState string
 
+const (
+	DeliverStrategy_DELIVER_IMMEDIATELY = deliverStrategy("DELIVER_IMMEDIATELY")
+	DeliverStrategy_STAGING             = deliverStrategy("STAGING")
+
+	MailState_STAGING         = mailState("STAGING")
+	MailState_DELIVER_SUCCESS = mailState("DELIVER_SUCCESS")
+	MailState_DELIVER_FAILED  = mailState("DELIVER_FAILED")
+
+	ReceiverType_To  = receiverType("To")
+	ReceiverType_Cc  = receiverType("Cc")
+	ReceiverType_Bcc = receiverType("Bcc")
+)
+
 var (
 	deliverStrategyName = []string{
 		"DELIVER_IMMEDIATELY",
@@ -15,9 +28,9 @@ var (
 	}
 
 	receiverTypeName = []string{
-		"TO",
-		"CC",
-		"BCC",
+		"To",
+		"Cc",
+		"Bcc",
 	}
 
 	mailStateName = []string{
@@ -86,7 +99,7 @@ type Dialer struct {
 	UserId int64
 
 	Host         string
-	Port         int32
+	Port         int
 	AuthUsername string
 	AuthPassword string
 

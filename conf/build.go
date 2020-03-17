@@ -1,6 +1,7 @@
 package conf
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -26,12 +27,12 @@ func getConfig() string {
 	defaultConfig := "app.yaml"
 
 	if len(os.Args) == 2 {
-		configFile := os.Args[1]
-		if len(strings.TrimSpace(configFile)) == 0 {
+		env := os.Args[1]
+		if len(strings.TrimSpace(env)) == 0 {
 			return defaultConfig
 		}
 
-		return configFile
+		return fmt.Sprintf("app.%s.yaml", env)
 	}
 
 	return defaultConfig

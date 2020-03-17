@@ -79,6 +79,7 @@ func executeRequestSafely(c *context, r *http.Request) {
 		}
 	}()
 
+	log.Info("receive request: " + r.URL.String())
 	http.DefaultServeMux.ServeHTTP(c, r)
 }
 

@@ -1,4 +1,4 @@
-env: prod
+env: dev
 app:
   port: 8080
 
@@ -9,4 +9,4 @@ cors:
   max-age: 86400
 
 data-source:
-  url: root:123456@tcp(123.57.237.176:3306)/gomailer
+  url: root:123456@tcp(127.0.0.1:3306)/gomailer
