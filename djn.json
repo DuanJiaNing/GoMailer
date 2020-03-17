@@ -32,7 +32,7 @@
     ],
     "template": {
       "contentType": "text/html",
-      "template": "<div><hr><h1>Test email: {{msg}}</h1><div/>"
+      "template": "<div>来自用户[{{name}}]的反馈, 用户电话号码: {{phone}}, 反馈内容如下:<hr><p>{{content}}</p><div/>"
     },
     "preference": {
       "deliverStrategy": "DELIVER_IMMEDIATELY",

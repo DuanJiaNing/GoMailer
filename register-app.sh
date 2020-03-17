@@ -5,4 +5,5 @@ function registerApp()
     echo $info
 }
 
-registerApp "http://8.9.30.183:8080/api/shortcut" $1
+#registerApp "http://8.9.30.183:8080/api/shortcut" $1
+registerApp "http://127.0.0.1:8080/api/shortcut" $1

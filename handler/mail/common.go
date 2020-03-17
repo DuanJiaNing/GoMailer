@@ -34,7 +34,7 @@ func create(mail *db.Mail) (*db.Mail, error) {
 	return mail, nil
 }
 
-func handleMail(endpointId int64, val map[string]interface{}) (*db.Mail, error) {
+func handleMail(endpointId int64, val map[string]string) (*db.Mail, error) {
 	client, err := db.NewClient()
 	if err != nil {
 		return nil, err
@@ -116,14 +116,14 @@ func handleMail(endpointId int64, val map[string]interface{}) (*db.Mail, error) 
 	return mail, nil
 }
 
-func parseContent(t string, val map[string]interface{}) string {
+func parseContent(t string, val map[string]string) string {
 	for key, value := range val {
 		t = strings.ReplaceAll(t, fmt.Sprintf("{{%s}}", key), fmt.Sprintf("%v", value))
 	}
 	return t
 }
 
-func getDefaultTemplate(val map[string]interface{}) (string, string) {
+func getDefaultTemplate(val map[string]string) (string, string) {
 	builder := strings.Builder{}
 	for key := range val {
 		builder.WriteString(fmt.Sprintf("%s:  {{%s}}\n", key, key))
