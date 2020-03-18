@@ -39,7 +39,7 @@ func send(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) {
 	}
 	mail, err := handleMail(ak.EndpointId, data)
 	if mail != nil {
-		_, err := create(mail)
+		_, err := create(ak.UserId, mail)
 		if err != nil {
 			return nil, app.Errorf(err, "fail to store mail")
 		}
