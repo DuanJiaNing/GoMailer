@@ -6,7 +6,6 @@ import (
 
 	"GoMailer/app"
 	"GoMailer/common/db"
-	"GoMailer/common/key"
 	"GoMailer/common/utils"
 	"GoMailer/handler"
 	"GoMailer/handler/dialer"
@@ -87,27 +86,32 @@ func shortcut(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) 
 
 	// 5. create or update endpoint
 	// vo.Endpoint is required
-	endpoint, err := handleEndpoint(vo.Endpoint.Name, user, userApp, dialer, template)
+	ep, err := handleEndpoint(vo.Endpoint.Name, user, userApp, dialer, template)
 	if err != nil {
 		return nil, err
 	}
 
 	// 6. create or update preference for endpoint
-	_, err = handleEndPointPreference(endpoint, vo.Endpoint.Preference)
+	_, err = handleEndPointPreference(ep, vo.Endpoint.Preference)
 	if err != nil {
 		return nil, err
 	}
 
 	// 7. add or update receiver for endpoint
-	err = handleEndPointReceiver(endpoint, user, userApp, vo.Endpoint.Receiver)
+	err = handleEndPointReceiver(ep, user, userApp, vo.Endpoint.Receiver)
 	if err != nil {
 		return nil, err
+	}
+
+	refreshKey, derr := endpoint.RefreshKey(ep.Id)
+	if derr != nil {
+		return nil, app.Errorf(derr, "failed to generate app key")
 	}
 
 	return struct {
 		UserId int64
 		AppKey string
-	}{UserId: user.Id, AppKey: key.EncodeAppKey(user.Id, userApp.Id, endpoint.Id)}, nil
+	}{UserId: user.Id, AppKey: refreshKey}, nil
 }
 
 func handleEndPointReceiver(ep *db.Endpoint, u *db.User, ua *db.UserApp, r []*db.Receiver) *app.Error {

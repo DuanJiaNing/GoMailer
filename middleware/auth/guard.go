@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"GoMailer/common/key"
-	"GoMailer/handler/userapp"
+	"GoMailer/handler/endpoint"
 )
 
 var (
@@ -21,13 +21,13 @@ func Guard(next http.Handler) http.Handler {
 				http.Error(w, err.Error(), http.StatusUnauthorized)
 				return
 			}
-			a, err := userapp.FindById(ak.AppId)
+			ep, err := endpoint.FindByKey(ak)
 			if err != nil {
-				http.Error(w, "illegal app_key, app may not exist", http.StatusUnauthorized)
+				http.Error(w, err.Error(), http.StatusUnauthorized)
 				return
 			}
-			if a.UserId != ak.UserId {
-				http.Error(w, "invalid app_key", http.StatusUnauthorized)
+			if ep == nil {
+				http.Error(w, "endpoint not exist", http.StatusUnauthorized)
 				return
 			}
 		}

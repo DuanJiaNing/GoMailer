@@ -1,6 +1,7 @@
 package mail
 
 import (
+	"GoMailer/handler/endpoint"
 	"errors"
 	"net/http"
 	"strings"
@@ -17,10 +18,14 @@ func init() {
 
 func send(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) {
 	ak, _ := key.AppKeyFromRequest(r)
+	ep, err := endpoint.FindByKey(ak)
+	if err != nil {
+		return nil, app.Errorf(err, "failed to find endpoint by key")
+	}
+
 	if err := r.ParseForm(); err != nil {
 		return nil, app.Errorf(err, "failed to parse form request")
 	}
-
 	data := make(map[string]string)
 	allBlank := true
 	for k, vs := range r.Form {
@@ -37,9 +42,9 @@ func send(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) {
 	if allBlank {
 		return nil, app.Errorf(errors.New("invalid parameter"), "not allow to send empty content")
 	}
-	mail, err := handleMail(ak.EndpointId, data)
+	mail, err := handleMail(ep.Id, data)
 	if mail != nil {
-		_, err := create(ak.UserId, mail)
+		_, err := create(ep.UserId, mail)
 		if err != nil {
 			return nil, app.Errorf(err, "fail to store mail")
 		}

@@ -68,6 +68,7 @@ type Endpoint struct {
 	UserId     int64
 
 	Name string
+	Key  string
 }
 
 type EndpointPreference struct {
