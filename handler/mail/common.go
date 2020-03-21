@@ -1,6 +1,7 @@
 package mail
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -61,6 +62,7 @@ func buildSql(tableName string) string {
 	sql.WriteString("  `state` varchar(100) NOT NULL,")
 	sql.WriteString("  `delivery_time` timestamp NULL DEFAULT NULL,")
 	sql.WriteString("  `content` longtext NOT NULL,")
+	sql.WriteString("  `raw` longtext NOT NULL,")
 	sql.WriteString("  PRIMARY KEY (`id`)")
 	sql.WriteString(") ENGINE=InnoDB DEFAULT CHARSET=utf8;")
 	return sql.String()
@@ -70,7 +72,7 @@ func getUserMailTableName(userId int64) string {
 	return fmt.Sprintf("mail_%d", userId)
 }
 
-func handleMail(endpointId int64, val map[string]string) (*db.Mail, error) {
+func handleMail(endpointId int64, raw map[string]string) (*db.Mail, error) {
 	client, err := db.NewClient()
 	if err != nil {
 		return nil, err
@@ -88,13 +90,18 @@ func handleMail(endpointId int64, val map[string]string) (*db.Mail, error) {
 		}
 	}
 
-	message, content, err := prepareMessage(endpointId, val)
+	message, content, err := prepareMessage(endpointId, raw)
 	if err != nil {
 		return nil, err
 	}
 
 	mail := &db.Mail{}
 	mail.Content = content
+	bytes, err := json.Marshal(raw)
+	if err != nil {
+		return nil, err
+	}
+	mail.Raw = string(bytes)
 	mail.EndpointId = endpointId
 	mail.State = db.MailState_STAGING.Name()
 	if edp.DeliverStrategy == db.DeliverStrategy_DELIVER_IMMEDIATELY.Name() {
@@ -211,3 +218,4 @@ func getDefaultTemplate(val map[string]string) (string, string) {
 	}
 	return builder.String(), "text/plain"
 }
+

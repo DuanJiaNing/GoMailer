@@ -35,8 +35,10 @@
       "template": "<div>来自用户[{{name}}]的反馈, 用户电话号码: {{phone}}, 反馈内容如下:<hr><p>{{content}}</p><div/>"
     },
     "preference": {
-      "deliverStrategy": "DELIVER_IMMEDIATELY",
-      "enableReCaptcha": 2
+      "deliverStrategy": "STAGING",
+      "enableReCaptcha": 2,
+      "successRedirect": "https://www.baidu.com",
+      "failRedirect": "https://www.google.com"
     }
   }
 }

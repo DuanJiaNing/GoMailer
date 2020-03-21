@@ -19,7 +19,7 @@ func FindByKey(key string) (*db.Endpoint, error) {
 	}
 
 	u := &db.Endpoint{}
-	has, err := client.Where("key = ?", key).Get(u)
+	has, err := client.Where("`key` = ?", key).Get(u)
 	if err != nil {
 		return nil, err
 	}

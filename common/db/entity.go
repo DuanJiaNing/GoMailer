@@ -79,6 +79,8 @@ type EndpointPreference struct {
 
 	DeliverStrategy string
 	EnableReCaptcha int32 // 1 enable 2 disable
+	SuccessRedirect string
+	FailRedirect    string
 }
 
 type Receiver struct {
@@ -125,6 +127,7 @@ type Mail struct {
 	State        string
 	DeliveryTime time.Time
 	Content      string
+	Raw          string
 }
 
 func ReceiverType(name string) receiverType {

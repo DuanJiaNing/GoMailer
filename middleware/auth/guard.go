@@ -9,7 +9,8 @@ import (
 
 var (
 	noGuardRequiredAPI = map[string]struct{}{
-		"/api/shortcut": {},
+		"/api/shortcut":  {},
+		"/api/mail/list": {},
 	}
 )
 

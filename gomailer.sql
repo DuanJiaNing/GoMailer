@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `dialer` (
   `name` varchar(500) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`,`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 -- 数据导出被取消选择。
 
@@ -41,9 +41,10 @@ CREATE TABLE IF NOT EXISTS `endpoint` (
   `template_id` int unsigned DEFAULT NULL,
   `user_id` int unsigned NOT NULL,
   `name` varchar(500) NOT NULL,
+  `key` varchar(1000) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_app_id` (`user_app_id`,`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 -- 数据导出被取消选择。
 
@@ -54,9 +55,11 @@ CREATE TABLE IF NOT EXISTS `endpoint_preference` (
   `endpoint_id` int unsigned NOT NULL,
   `deliver_strategy` varchar(500) DEFAULT NULL,
   `enable_re_captcha` tinyint DEFAULT NULL,
+  `success_redirect` text,
+  `fail_redirect` text,
   PRIMARY KEY (`id`),
   UNIQUE KEY `end_point_id` (`endpoint_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 
 -- 数据导出被取消选择。
 
@@ -68,8 +71,37 @@ CREATE TABLE IF NOT EXISTS `mail` (
   `state` varchar(100) NOT NULL,
   `delivery_time` timestamp NULL DEFAULT NULL,
   `content` longtext NOT NULL,
+  `raw` longtext NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 数据导出被取消选择。
+
+-- 导出  表 gomailer.mail_1 结构
+CREATE TABLE IF NOT EXISTS `mail_1` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `insert_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `endpoint_id` int NOT NULL,
+  `state` varchar(100) NOT NULL,
+  `delivery_time` timestamp NULL DEFAULT NULL,
+  `content` longtext NOT NULL,
+  `raw` longtext NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+-- 数据导出被取消选择。
+
+-- 导出  表 gomailer.mail_4 结构
+CREATE TABLE IF NOT EXISTS `mail_4` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `insert_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `endpoint_id` int NOT NULL,
+  `state` varchar(100) NOT NULL,
+  `delivery_time` timestamp NULL DEFAULT NULL,
+  `content` longtext NOT NULL,
+  `raw` longtext NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
 -- 数据导出被取消选择。
 
@@ -83,7 +115,7 @@ CREATE TABLE IF NOT EXISTS `receiver` (
   `address` varchar(1000) NOT NULL,
   `receiver_type` varchar(500) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=75 DEFAULT CHARSET=utf8;
 
 -- 数据导出被取消选择。
 
@@ -95,7 +127,7 @@ CREATE TABLE IF NOT EXISTS `template` (
   `template` longtext NOT NULL,
   `content_type` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8;
 
 -- 数据导出被取消选择。
 
@@ -107,7 +139,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `password` varchar(1000) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 -- 数据导出被取消选择。
 
@@ -120,7 +152,7 @@ CREATE TABLE IF NOT EXISTS `user_app` (
   `host` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`,`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 -- 数据导出被取消选择。
 

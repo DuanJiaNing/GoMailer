@@ -1,6 +1,8 @@
 package shortcut
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"net/http"
 
@@ -284,10 +286,16 @@ func handleUser(u *db.User) (*db.User, *app.Error) {
 	if err != nil {
 		return nil, app.Errorf(err, "failed to get user")
 	}
+	ps := sha256.Sum256([]byte(u.Password))
+	u.Password = hex.EncodeToString(ps[:])
 	if us == nil {
 		us, err = user.Create(u)
 		if err != nil {
 			return nil, app.Errorf(err, "failed to create user")
+		}
+	} else {
+		if us.Password != u.Password {
+			return nil, app.Errorf(errors.New("password incorrect"), "wrong password")
 		}
 	}
 
