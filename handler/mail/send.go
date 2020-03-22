@@ -33,7 +33,7 @@ func send(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) {
 	}
 	mail, err := handleMail(ep.Id, raw)
 	if mail != nil {
-		_, err := create(ep.UserId, mail)
+		_, err := Create(ep.UserId, mail)
 		if err != nil {
 			sendRedirect(w, ep.Id, err)
 			return nil, app.Errorf(err, "fail to store mail")

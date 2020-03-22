@@ -24,7 +24,7 @@ func init() {
 }
 
 func getConfig() string {
-	defaultConfig := "app.yaml"
+	defaultConfig := "app.dev.yaml"
 
 	if len(os.Args) == 2 {
 		env := os.Args[1]

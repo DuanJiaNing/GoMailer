@@ -125,9 +125,19 @@ type Mail struct {
 
 	EndpointId   int64
 	State        string
-	DeliveryTime time.Time
+	DeliveryTime Time
 	Content      string
 	Raw          string
+}
+
+type Time time.Time
+
+func (t Time) MarshalJSON() ([]byte, error) {
+	tm := time.Time(t)
+	if tm.IsZero() {
+		return []byte(`""`), nil
+	}
+	return tm.MarshalJSON()
 }
 
 func ReceiverType(name string) receiverType {

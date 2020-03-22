@@ -16,7 +16,7 @@ var (
 
 func Guard(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if _, ok := noGuardRequiredAPI[r.URL.String()]; !ok {
+		if _, ok := noGuardRequiredAPI[r.URL.Path]; !ok {
 			ak, err := key.AppKeyFromRequest(r)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusUnauthorized)
