@@ -79,12 +79,17 @@ func VerifyReCaptcha(token string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	m := make(map[string]interface{})
+	m := struct {
+		ChallengeTs time.Time `json:"challenge_ts"`
+		Score       float32   `json:"score"`
+		Hostname    string    `json:"hostname"`
+		Success     bool      `json:"success"`
+	}{}
 	err = json.NewDecoder(resp.Body).Decode(&m)
 	if err != nil {
 		return false, err
 	}
 	log.Infof("%+v", m)
 
-	return false, nil
+	return m.Success, nil
 }
