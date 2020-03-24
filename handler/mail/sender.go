@@ -10,10 +10,11 @@ import (
 	"gopkg.in/gomail.v2"
 
 	"GoMailer/common/db"
+	"GoMailer/common/key"
 	"GoMailer/log"
 )
 
-func handleMail(endpointId int64, raw map[string]string) (*db.Mail, error) {
+func handleMail(endpointId int64, raw map[string]string, reCaptchaKey string) (*db.Mail, error) {
 	client, err := db.NewClient()
 	if err != nil {
 		return nil, err
@@ -27,7 +28,17 @@ func handleMail(endpointId int64, raw map[string]string) (*db.Mail, error) {
 	if !get {
 		edp = &db.EndpointPreference{
 			DeliverStrategy: db.DeliverStrategy_DELIVER_IMMEDIATELY.Name(),
-			EnableReCaptcha: 1, // TODO
+			EnableReCaptcha: 2, // Default is disable reCaptcha.
+		}
+	}
+
+	if edp.EnableReCaptcha == 1 {
+		ok, err := key.VerifyReCaptcha(reCaptchaKey)
+		if err != nil {
+			return nil, err
+		}
+		if !ok {
+			return nil, errors.New("reCaptcha verify failed")
 		}
 	}
 

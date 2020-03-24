@@ -1,7 +1,6 @@
 package mail
 
 import (
-	"GoMailer/common/utils"
 	"errors"
 	"net/http"
 	"strings"
@@ -9,6 +8,7 @@ import (
 	"GoMailer/app"
 	"GoMailer/common/db"
 	"GoMailer/common/key"
+	"GoMailer/common/utils"
 	"GoMailer/handler"
 	"GoMailer/handler/endpoint"
 	"GoMailer/log"
@@ -20,7 +20,10 @@ func init() {
 }
 
 func send(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) {
-	ak, _ := key.AppKeyFromRequest(r)
+	if err := r.ParseForm(); err != nil {
+		return nil, app.Errorf(err, "failed to parse form")
+	}
+	ak := key.AppKeyFromRequest(r)
 	ep, err := endpoint.FindByKey(ak)
 	if err != nil {
 		return nil, app.Errorf(err, "failed to find endpoint by key")
@@ -31,7 +34,7 @@ func send(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) {
 		sendRedirect(w, ep.Id, err)
 		return nil, app.Errorf(err, "got error when parse form")
 	}
-	mail, err := handleMail(ep.Id, raw)
+	mail, err := handleMail(ep.Id, raw, key.ReCaptchaKeyFromRequest(r))
 	if mail != nil {
 		_, err := Create(ep.UserId, mail)
 		if err != nil {
@@ -79,13 +82,10 @@ func sendRedirect(w http.ResponseWriter, endpointId int64, err error) {
 }
 
 func parseForm(r *http.Request) (map[string]string, error) {
-	if err := r.ParseForm(); err != nil {
-		return nil, err
-	}
 	data := make(map[string]string)
 	allBlank := true
 	for k, vs := range r.Form {
-		if k == "app_key" {
+		if k == key.AppKeyName || k == key.ReCaptchaTokenKeyName {
 			continue
 		}
 
