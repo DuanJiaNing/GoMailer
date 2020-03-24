@@ -80,7 +80,7 @@ func VerifyReCaptcha(token string) (bool, error) {
 		return false, err
 	}
 	m := make(map[string]interface{})
-	err = json.NewDecoder(resp.Body).Decode(m)
+	err = json.NewDecoder(resp.Body).Decode(&m)
 	if err != nil {
 		return false, err
 	}
