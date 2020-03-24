@@ -36,7 +36,7 @@
     },
     "preference": {
       "deliverStrategy": "STAGING",
-      "enableReCaptcha": false,
+      "enableReCaptcha": 2,
       "successRedirect": "http://www.duanjn.com/feedback-success.html",
       "failRedirect": "http://www.duanjn.com/feedback-fail.html"
     }
