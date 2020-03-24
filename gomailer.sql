@@ -77,34 +77,6 @@ CREATE TABLE IF NOT EXISTS `mail` (
 
 -- 数据导出被取消选择。
 
--- 导出  表 gomailer.mail_1 结构
-CREATE TABLE IF NOT EXISTS `mail_1` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `insert_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `endpoint_id` int NOT NULL,
-  `state` varchar(100) NOT NULL,
-  `delivery_time` timestamp NULL DEFAULT NULL,
-  `content` longtext NOT NULL,
-  `raw` longtext NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
-
--- 数据导出被取消选择。
-
--- 导出  表 gomailer.mail_4 结构
-CREATE TABLE IF NOT EXISTS `mail_4` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `insert_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `endpoint_id` int NOT NULL,
-  `state` varchar(100) NOT NULL,
-  `delivery_time` timestamp NULL DEFAULT NULL,
-  `content` longtext NOT NULL,
-  `raw` longtext NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
-
--- 数据导出被取消选择。
-
 -- 导出  表 gomailer.receiver 结构
 CREATE TABLE IF NOT EXISTS `receiver` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -115,7 +87,7 @@ CREATE TABLE IF NOT EXISTS `receiver` (
   `address` varchar(1000) NOT NULL,
   `receiver_type` varchar(500) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=75 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8;
 
 -- 数据导出被取消选择。
 
@@ -127,7 +99,7 @@ CREATE TABLE IF NOT EXISTS `template` (
   `template` longtext NOT NULL,
   `content_type` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8;
 
 -- 数据导出被取消选择。
 

@@ -28,14 +28,15 @@ CREATE TABLE IF NOT EXISTS `dialer` (
   `name` varchar(500) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`,`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
--- 正在导出表  gomailer.dialer 的数据：~3 rows (大约)
+-- 正在导出表  gomailer.dialer 的数据：~4 rows (大约)
 /*!40000 ALTER TABLE `dialer` DISABLE KEYS */;
 INSERT INTO `dialer` (`id`, `insert_time`, `host`, `port`, `user_id`, `auth_username`, `auth_password`, `name`) VALUES
 	(1, '2020-03-12 12:03:48', 'smtp.qq.com', 465, 3, '666@qq.com', '666aaa111', 'XX公司'),
 	(2, '2020-03-12 13:05:21', 'smtp.qq.com', 465, 1, '666@qq.com', '666aaa', 'XX公司'),
-	(3, '2020-03-18 17:02:38', 'smtp.qq.com', 465, 1, '2213994603@qq.com', 'athupcbmeyvvdjif', 'DuanJiaNing公司');
+	(3, '2020-03-18 17:02:38', 'smtp.qq.com', 465, 1, '2213994603@qq.com', 'athupcbmeyvvdjif', 'DuanJiaNing公司'),
+	(4, '2020-03-21 16:35:54', 'smtp.qq.com', 465, 4, '2213994603@qq.com', 'athupcbmeyvvdjif', 'DuanJiaNing公司');
 /*!40000 ALTER TABLE `dialer` ENABLE KEYS */;
 
 -- 导出  表 gomailer.endpoint 结构
@@ -50,13 +51,14 @@ CREATE TABLE IF NOT EXISTS `endpoint` (
   `key` varchar(1000) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_app_id` (`user_app_id`,`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
--- 正在导出表  gomailer.endpoint 的数据：~2 rows (大约)
+-- 正在导出表  gomailer.endpoint 的数据：~3 rows (大约)
 /*!40000 ALTER TABLE `endpoint` DISABLE KEYS */;
 INSERT INTO `endpoint` (`id`, `insert_time`, `user_app_id`, `dialer_id`, `template_id`, `user_id`, `name`, `key`) VALUES
 	(1, '2020-03-12 13:36:26', 1, 3, 38, 1, '发送反馈', 'Wiov3aJpmu'),
-	(2, '2020-03-18 17:02:38', 1, 3, 39, 1, '用户反馈', 'P9jwNrzCpz');
+	(2, '2020-03-18 17:02:38', 1, 3, 40, 1, '用户反馈', 'QOF1BAlgJI'),
+	(3, '2020-03-21 16:35:54', 4, 4, 42, 4, '用户反馈', 'F2whUzZPNd');
 /*!40000 ALTER TABLE `endpoint` ENABLE KEYS */;
 
 -- 导出  表 gomailer.endpoint_preference 结构
@@ -66,15 +68,18 @@ CREATE TABLE IF NOT EXISTS `endpoint_preference` (
   `endpoint_id` int unsigned NOT NULL,
   `deliver_strategy` varchar(500) DEFAULT NULL,
   `enable_re_captcha` tinyint DEFAULT NULL,
+  `success_redirect` text,
+  `fail_redirect` text,
   PRIMARY KEY (`id`),
   UNIQUE KEY `end_point_id` (`endpoint_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 
--- 正在导出表  gomailer.endpoint_preference 的数据：~1 rows (大约)
+-- 正在导出表  gomailer.endpoint_preference 的数据：~3 rows (大约)
 /*!40000 ALTER TABLE `endpoint_preference` DISABLE KEYS */;
-INSERT INTO `endpoint_preference` (`id`, `insert_time`, `endpoint_id`, `deliver_strategy`, `enable_re_captcha`) VALUES
-	(4, '2020-03-12 14:08:41', 1, 'DELIVER_IMMEDIATELY', 2),
-	(5, '2020-03-18 17:02:38', 2, 'DELIVER_IMMEDIATELY', 2);
+INSERT INTO `endpoint_preference` (`id`, `insert_time`, `endpoint_id`, `deliver_strategy`, `enable_re_captcha`, `success_redirect`, `fail_redirect`) VALUES
+	(4, '2020-03-12 14:08:41', 1, 'DELIVER_IMMEDIATELY', 2, NULL, NULL),
+	(5, '2020-03-18 17:02:38', 2, 'STAGING', 2, NULL, NULL),
+	(6, '2020-03-21 16:35:54', 3, 'STAGING', 2, 'https://www.baidu.com', 'https://www.google.com');
 /*!40000 ALTER TABLE `endpoint_preference` ENABLE KEYS */;
 
 -- 导出  表 gomailer.mail 结构
@@ -93,6 +98,50 @@ CREATE TABLE IF NOT EXISTS `mail` (
 /*!40000 ALTER TABLE `mail` DISABLE KEYS */;
 /*!40000 ALTER TABLE `mail` ENABLE KEYS */;
 
+-- 导出  表 gomailer.mail_1 结构
+CREATE TABLE IF NOT EXISTS `mail_1` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `insert_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `endpoint_id` int NOT NULL,
+  `state` varchar(100) NOT NULL,
+  `delivery_time` timestamp NULL DEFAULT NULL,
+  `content` longtext NOT NULL,
+  `raw` longtext NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+-- 正在导出表  gomailer.mail_1 的数据：~1 rows (大约)
+/*!40000 ALTER TABLE `mail_1` DISABLE KEYS */;
+INSERT INTO `mail_1` (`id`, `insert_time`, `endpoint_id`, `state`, `delivery_time`, `content`, `raw`) VALUES
+	(1, '2020-03-21 09:31:24', 2, 'STAGING', NULL, '<div>来自用户[djn]的反馈, 用户电话号码: 1234423, 反馈内容如下:<hr><p>参数再次</p><div/>', '{"content":"参数再次","name":"djn","phone":"1234423"}');
+/*!40000 ALTER TABLE `mail_1` ENABLE KEYS */;
+
+-- 导出  表 gomailer.mail_4 结构
+CREATE TABLE IF NOT EXISTS `mail_4` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `insert_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `endpoint_id` int NOT NULL,
+  `state` varchar(100) NOT NULL,
+  `delivery_time` timestamp NULL DEFAULT NULL,
+  `content` longtext NOT NULL,
+  `raw` longtext NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+
+-- 正在导出表  gomailer.mail_4 的数据：~9 rows (大约)
+/*!40000 ALTER TABLE `mail_4` DISABLE KEYS */;
+INSERT INTO `mail_4` (`id`, `insert_time`, `endpoint_id`, `state`, `delivery_time`, `content`, `raw`) VALUES
+	(1, '2020-03-21 16:37:58', 3, 'STAGING', NULL, '<div>来自用户["name"]的反馈, 用户电话号码: "phone", 反馈内容如下:<hr><p>ads</p><div/>', '{"content":"ads"}'),
+	(2, '2020-03-21 16:39:03', 3, 'STAGING', NULL, '<div>来自用户[issue]的反馈, 用户电话号码: 18654253014, 反馈内容如下:<hr><p>sdf</p><div/>', '{"content":"sdf","name":"issue","phone":"18654253014"}'),
+	(3, '2020-03-21 16:41:06', 3, 'STAGING', NULL, '<div>来自用户[afas]的反馈, 用户电话号码: , 反馈内容如下:<hr><p></p><div/>', '{"content":"","name":"afas","phone":""}'),
+	(4, '2020-03-21 16:43:17', 3, 'STAGING', NULL, '<div>来自用户[]的反馈, 用户电话号码: 18325458745, 反馈内容如下:<hr><p></p><div/>', '{"content":"","name":"","phone":"18325458745"}'),
+	(5, '2020-03-21 16:43:31', 3, 'STAGING', NULL, '<div>来自用户[]的反馈, 用户电话号码: 18325458745, 反馈内容如下:<hr><p>af</p><div/>', '{"content":"af","name":"","phone":"18325458745"}'),
+	(6, '2020-03-21 17:00:34', 3, 'STAGING', NULL, '<div>来自用户[]的反馈, 用户电话号码: , 反馈内容如下:<hr><p>sad</p><div/>', '{"content":"sad","name":"","phone":""}'),
+	(7, '2020-03-21 17:29:13', 3, 'STAGING', NULL, '<div>来自用户[]的反馈, 用户电话号码: , 反馈内容如下:<hr><p>sad</p><div/>', '{"content":"sad","name":"","phone":""}'),
+	(8, '2020-03-21 17:30:05', 3, 'STAGING', NULL, '<div>来自用户[]的反馈, 用户电话号码: , 反馈内容如下:<hr><p>sad</p><div/>', '{"content":"sad","name":"","phone":""}'),
+	(9, '2020-03-21 17:30:12', 3, 'STAGING', NULL, '<div>来自用户[]的反馈, 用户电话号码: , 反馈内容如下:<hr><p>sadsds</p><div/>', '{"content":"sadsds","name":"","phone":""}');
+/*!40000 ALTER TABLE `mail_4` ENABLE KEYS */;
+
 -- 导出  表 gomailer.receiver 结构
 CREATE TABLE IF NOT EXISTS `receiver` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -103,17 +152,20 @@ CREATE TABLE IF NOT EXISTS `receiver` (
   `address` varchar(1000) NOT NULL,
   `receiver_type` varchar(500) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8;
 
--- 正在导出表  gomailer.receiver 的数据：~6 rows (大约)
+-- 正在导出表  gomailer.receiver 的数据：~9 rows (大约)
 /*!40000 ALTER TABLE `receiver` DISABLE KEYS */;
 INSERT INTO `receiver` (`id`, `insert_time`, `endpoint_id`, `user_id`, `user_app_id`, `address`, `receiver_type`) VALUES
 	(63, '2020-03-19 11:40:46', 1, 1, 1, 'TO_djn<duan_jia_ning@163.com>', 'To'),
 	(64, '2020-03-19 11:40:46', 1, 1, 1, 'CC_djn<duanjianing0@gmail.com>', 'Cc'),
 	(65, '2020-03-19 11:40:46', 1, 1, 1, 'BCC_djn<aimeimeits@gmail.com>', 'Bcc'),
-	(66, '2020-03-19 11:41:07', 2, 1, 1, 'TO_djn<duan_jia_ning@163.com>', 'To'),
-	(67, '2020-03-19 11:41:07', 2, 1, 1, 'CC_djn<duanjianing0@gmail.com>', 'Cc'),
-	(68, '2020-03-19 11:41:07', 2, 1, 1, 'BCC_djn<aimeimeits@gmail.com>', 'Bcc');
+	(69, '2020-03-21 09:21:20', 2, 1, 1, 'TO_djn<duan_jia_ning@163.com>', 'To'),
+	(70, '2020-03-21 09:21:20', 2, 1, 1, 'CC_djn<duanjianing0@gmail.com>', 'Cc'),
+	(71, '2020-03-21 09:21:20', 2, 1, 1, 'BCC_djn<aimeimeits@gmail.com>', 'Bcc'),
+	(75, '2020-03-21 16:58:45', 3, 4, 4, 'TO_djn<duan_jia_ning@163.com>', 'To'),
+	(76, '2020-03-21 16:58:45', 3, 4, 4, 'CC_djn<duanjianing0@gmail.com>', 'Cc'),
+	(77, '2020-03-21 16:58:45', 3, 4, 4, 'BCC_djn<aimeimeits@gmail.com>', 'Bcc');
 /*!40000 ALTER TABLE `receiver` ENABLE KEYS */;
 
 -- 导出  表 gomailer.template 结构
@@ -124,9 +176,9 @@ CREATE TABLE IF NOT EXISTS `template` (
   `template` longtext NOT NULL,
   `content_type` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8;
 
--- 正在导出表  gomailer.template 的数据：~39 rows (大约)
+-- 正在导出表  gomailer.template 的数据：~42 rows (大约)
 /*!40000 ALTER TABLE `template` DISABLE KEYS */;
 INSERT INTO `template` (`id`, `insert_time`, `user_id`, `template`, `content_type`) VALUES
 	(1, '2020-03-12 13:06:23', 1, '<div><hr><h1>Test email{{msg}}</h1><div/>', 'text/html'),
@@ -167,7 +219,10 @@ INSERT INTO `template` (`id`, `insert_time`, `user_id`, `template`, `content_typ
 	(36, '2020-03-18 17:58:18', 1, '<div>来自用户[{{name}}]的反馈, 用户电话号码: {{phone}}, 反馈内容如下:<hr><p>{{content}}</p><div/>', 'text/html'),
 	(37, '2020-03-19 11:39:00', 1, '<div>来自用户[{{name}}]的反馈, 用户电话号码: {{phone}}, 反馈内容如下:<hr><p>{{content}}</p><div/>', 'text/html'),
 	(38, '2020-03-19 11:40:46', 1, '<div>来自用户[{{name}}]的反馈, 用户电话号码: {{phone}}, 反馈内容如下:<hr><p>{{content}}</p><div/>', 'text/html'),
-	(39, '2020-03-19 11:41:07', 1, '<div>来自用户[{{name}}]的反馈, 用户电话号码: {{phone}}, 反馈内容如下:<hr><p>{{content}}</p><div/>', 'text/html');
+	(39, '2020-03-19 11:41:07', 1, '<div>来自用户[{{name}}]的反馈, 用户电话号码: {{phone}}, 反馈内容如下:<hr><p>{{content}}</p><div/>', 'text/html'),
+	(40, '2020-03-21 09:21:20', 1, '<div>来自用户[{{name}}]的反馈, 用户电话号码: {{phone}}, 反馈内容如下:<hr><p>{{content}}</p><div/>', 'text/html'),
+	(41, '2020-03-21 16:35:54', 4, '<div>来自用户[{{name}}]的反馈, 用户电话号码: {{phone}}, 反馈内容如下:<hr><p>{{content}}</p><div/>', 'text/html'),
+	(42, '2020-03-21 16:58:45', 4, '<div>来自用户[{{name}}]的反馈, 用户电话号码: {{phone}}, 反馈内容如下:<hr><p>{{content}}</p><div/>', 'text/html');
 /*!40000 ALTER TABLE `template` ENABLE KEYS */;
 
 -- 导出  表 gomailer.user 结构
@@ -178,14 +233,15 @@ CREATE TABLE IF NOT EXISTS `user` (
   `password` varchar(1000) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
--- 正在导出表  gomailer.user 的数据：~3 rows (大约)
+-- 正在导出表  gomailer.user 的数据：~4 rows (大约)
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
 INSERT INTO `user` (`id`, `insert_time`, `username`, `password`) VALUES
 	(1, '2020-03-12 11:21:43', 'djn', '123456'),
 	(2, '2020-03-12 11:23:26', 'dj1n', '123456'),
-	(3, '2020-03-12 11:45:08', 'djn1', '123456');
+	(3, '2020-03-12 11:45:08', 'djn1', '123456'),
+	(4, '2020-03-21 16:35:53', 'djn2', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 
 -- 导出  表 gomailer.user_app 结构
@@ -197,14 +253,15 @@ CREATE TABLE IF NOT EXISTS `user_app` (
   `host` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`,`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
--- 正在导出表  gomailer.user_app 的数据：~2 rows (大约)
+-- 正在导出表  gomailer.user_app 的数据：~3 rows (大约)
 /*!40000 ALTER TABLE `user_app` DISABLE KEYS */;
 INSERT INTO `user_app` (`id`, `insert_time`, `user_id`, `name`, `host`) VALUES
 	(1, '2020-03-12 11:42:40', 1, 'demo', 'demo.com'),
 	(2, '2020-03-12 11:45:08', 3, 'demo', 'demo.com'),
-	(3, '2020-03-12 12:02:38', 3, 'demo1', 'demo.com');
+	(3, '2020-03-12 12:02:38', 3, 'demo1', 'demo.com'),
+	(4, '2020-03-21 16:35:54', 4, 'demo', 'demo.com');
 /*!40000 ALTER TABLE `user_app` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
