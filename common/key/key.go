@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"GoMailer/common/utils"
-	"GoMailer/log"
 )
 
 const (
@@ -89,7 +88,6 @@ func VerifyReCaptcha(token string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	log.Infof("%+v", m)
 
 	return m.Success, nil
 }
