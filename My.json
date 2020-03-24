@@ -1,11 +1,11 @@
 {
   "user": {
-    "username": "djn",
+    "username": "DuanJiaNing",
     "password": "123456"
   },
   "app": {
-    "name": "demo",
-    "host": "demo.com"
+    "name": "My",
+    "host": "duanjn.com"
   },
   "endpoint": {
     "name": "用户反馈",
@@ -14,7 +14,7 @@
       "port": 465,
       "authUsername": "2213994603@qq.com",
       "authPassword": "athupcbmeyvvdjif",
-      "name": "DuanJiaNing公司"
+      "name": "DuanJiaNing"
     },
     "receiver": [
       {
@@ -32,13 +32,13 @@
     ],
     "template": {
       "contentType": "text/html",
-      "template": "<div>来自用户[{{name}}]的反馈, 用户电话号码: {{phone}}, 反馈内容如下:<hr><p>{{content}}</p><div/>"
+      "template": "<div>来自用户[{{name}}]的反馈, 用户联系方式: {{contact}}, 反馈内容如下:<hr><p>{{content}}</p><div/>"
     },
     "preference": {
       "deliverStrategy": "STAGING",
-      "enableReCaptcha": 2,
-      "successRedirect": "https://www.baidu.com",
-      "failRedirect": "https://www.google.com"
+      "enableReCaptcha": false,
+      "successRedirect": "http://www.duanjn.com/feedback-success.html",
+      "failRedirect": "http://www.duanjn.com/feedback-fail.html"
     }
   }
 }
