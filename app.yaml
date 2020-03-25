@@ -10,3 +10,5 @@ cors:
 
 data-source:
   url: root:123456@tcp(123.57.237.176:3306)/gomailer
+
+re-captcha-secret: 6Ld2jeMUAAAAAJ_9NsYfI1xqzieIgxOFzb8aPUOa

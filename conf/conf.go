@@ -5,6 +5,8 @@ type config struct {
 	Cors       *cors       `yaml:"cors"`
 	App        *app        `yaml:"app"`
 	DataSource *dataSource `yaml:"data-source"`
+
+	ReCaptchaSecret string `yaml:"re-captcha-secret"`
 }
 
 type cors struct {
@@ -32,6 +34,10 @@ func DataSource() *dataSource {
 
 func Env() string {
 	return conf.Env
+}
+
+func ReCaptchaSecret() string {
+	return conf.ReCaptchaSecret
 }
 
 func Cors() *cors {

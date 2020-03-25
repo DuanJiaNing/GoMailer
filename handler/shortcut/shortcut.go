@@ -105,15 +105,10 @@ func shortcut(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) 
 		return nil, err
 	}
 
-	refreshKey, derr := endpoint.RefreshKey(ep.Id)
-	if derr != nil {
-		return nil, app.Errorf(derr, "failed to generate app key")
-	}
-
 	return struct {
 		UserId int64
 		AppKey string
-	}{UserId: user.Id, AppKey: refreshKey}, nil
+	}{UserId: user.Id, AppKey: ep.Key}, nil
 }
 
 func handleEndPointReceiver(ep *db.Endpoint, u *db.User, ua *db.UserApp, r []*db.Receiver) *app.Error {
@@ -193,6 +188,11 @@ func handleEndpoint(name string, u *db.User, ap *db.UserApp, ud *db.Dialer, ut *
 		if err != nil {
 			return nil, app.Errorf(err, "failed to create endpoint")
 		}
+		key, err := endpoint.RefreshKey(ep.Id)
+		if err != nil {
+			return nil, app.Errorf(err, "failed to generate app key")
+		}
+		ep.Key = key
 	} else {
 		nep.Id = ep.Id
 		ep, err = endpoint.Update(nep)

@@ -9,12 +9,12 @@ import (
 	"time"
 
 	"GoMailer/common/utils"
+	"GoMailer/conf"
 )
 
 const (
 	AppKeyName            = "app_key"
 	ReCaptchaTokenKeyName = "grecaptcha_token"
-	reCaptchaSecret       = "6Ld2jeMUAAAAAJ_9NsYfI1xqzieIgxOFzb8aPUOa"
 )
 
 func ReCaptchaKeyFromRequest(r *http.Request) string {
@@ -74,7 +74,7 @@ func VerifyReCaptcha(token string) (bool, error) {
 	}
 
 	const addr = "https://recaptcha.net/recaptcha/api/siteverify?secret=%s&response=%s"
-	resp, err := http.Get(fmt.Sprintf(addr, reCaptchaSecret, token))
+	resp, err := http.Get(fmt.Sprintf(addr, conf.ReCaptchaSecret(), token))
 	if err != nil {
 		return false, err
 	}
