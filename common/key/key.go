@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	AppKeyName            = "app_key"
+	EPKeyName             = "epKey"
 	ReCaptchaTokenKeyName = "grecaptcha_token"
 )
 
@@ -41,18 +41,18 @@ func getFromForm(r *http.Request, keyName string) string {
 	return ""
 }
 
-func AppKeyFromRequest(r *http.Request) string {
-	appKey := r.URL.Query().Get(AppKeyName)
+func EPKeyFromRequest(r *http.Request) string {
+	appKey := r.URL.Query().Get(EPKeyName)
 	if !utils.IsBlankStr(appKey) {
 		return appKey
 	}
 
-	appKey = r.Header.Get(AppKeyName)
+	appKey = r.Header.Get(EPKeyName)
 	if !utils.IsBlankStr(appKey) {
 		return appKey
 	}
 
-	return getFromForm(r, AppKeyName)
+	return getFromForm(r, EPKeyName)
 }
 
 func GenerateKey() string {

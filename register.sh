@@ -5,4 +5,4 @@ function registerApp()
     echo $info
 }
 
-registerApp "http://mail.duanjn.com/api/shortcut" $1
+registerApp $1 $2

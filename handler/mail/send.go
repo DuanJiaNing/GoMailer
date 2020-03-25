@@ -23,8 +23,8 @@ func send(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) {
 	if err := r.ParseForm(); err != nil {
 		return nil, app.Errorf(err, "failed to parse form")
 	}
-	ak := key.AppKeyFromRequest(r)
-	ep, err := endpoint.FindByKey(ak)
+	epk := key.EPKeyFromRequest(r)
+	ep, err := endpoint.FindByKey(epk)
 	if err != nil {
 		return nil, app.Errorf(err, "failed to find endpoint by key")
 	}
@@ -85,7 +85,7 @@ func parseForm(r *http.Request) (map[string]string, error) {
 	data := make(map[string]string)
 	allBlank := true
 	for k, vs := range r.Form {
-		if k == key.AppKeyName || k == key.ReCaptchaTokenKeyName {
+		if k == key.EPKeyName || k == key.ReCaptchaTokenKeyName {
 			continue
 		}
 

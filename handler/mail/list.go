@@ -1,14 +1,15 @@
 package mail
 
 import (
-	"errors"
 	"net/http"
 	"strconv"
 	"time"
 
 	"GoMailer/app"
 	"GoMailer/common/db"
+	"GoMailer/common/key"
 	"GoMailer/handler"
+	"GoMailer/handler/endpoint"
 )
 
 const (
@@ -37,14 +38,15 @@ func init() {
 }
 
 func list(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) {
-	uid := r.URL.Query().Get("uid")
-	userId, err := strconv.Atoi(uid)
+	epk := key.EPKeyFromRequest(r)
+	ep, err := endpoint.FindByKey(epk)
 	if err != nil {
-		return nil, app.Errorf(errors.New("uid is not a number"), "uid illegal")
+		return nil, app.Errorf(err, "failed to find endpoint by key")
 	}
+	userId := ep.UserId
 	pageNum, pageSize := parsePageCondition(r)
 
-	res, total, err := Find(int64(userId), pageNum, pageSize)
+	res, total, err := Find(userId, pageNum, pageSize)
 	if err != nil {
 		return nil, app.Errorf(err, "failed to find user post")
 	}

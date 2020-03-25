@@ -10,20 +10,19 @@ import (
 
 var (
 	noGuardRequiredAPI = map[string]struct{}{
-		"/api/shortcut":  {},
-		"/api/mail/list": {},
+		"/api/shortcut": {},
 	}
 )
 
 func Guard(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if _, ok := noGuardRequiredAPI[r.URL.Path]; !ok {
-			ak := key.AppKeyFromRequest(r)
-			if utils.IsBlankStr(ak) {
-				http.Error(w, "app_key is required", http.StatusUnauthorized)
+			epk := key.EPKeyFromRequest(r)
+			if utils.IsBlankStr(epk) {
+				http.Error(w, "epKey is required", http.StatusUnauthorized)
 				return
 			}
-			ep, err := endpoint.FindByKey(ak)
+			ep, err := endpoint.FindByKey(epk)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusUnauthorized)
 				return
