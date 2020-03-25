@@ -5,9 +5,8 @@
 也可以选择把邮件暂存在GoMailer中，另外选择时间手动触发投递。
 
 额外的可选配置: 
-
-1. 支持开启reCaptcha验证，避免恶意投递；
-2. 配置请求成功或失败时的重定向地址，相应事件发生时用户将被重定向到指定页面。
+1 支持开启reCaptcha验证，避免恶意投递；
+2 配置请求成功或失败时的重定向地址，相应事件发生时用户将被重定向到指定页面。
 
 ## Release Note
 - v0.1.0
@@ -111,7 +110,7 @@ API: `POST /api/mail/send`
 reCaptcha的集成可参考[这里](https://www.cnblogs.com/dulinan/p/12033018.html)
 
 #### 3. 查询邮件
-API: GET `/api/mail/list`
+API: `GET /api/mail/list`
 
 请求示例: /api/mail/list?uid=1&pn=1&ps=10
 - pn: 分页页码，可不传，从1开始，默认1
@@ -128,7 +127,7 @@ API: GET `/api/mail/list`
             "InsertTime":"2020-03-21T16:37:58+08:00",  
             "State":"STAGING",
             "DeliveryTime":"2020-03-21T16:37:58+08:00",
-            "Content":"<div>来自用户[小马]的反馈, 用户电话号码: 1999999999, 反馈内容如下:<hr><p>不错</p><div/>",   // 邮件内容
+            "Content":"<div>来自用户[小马]的反馈, 用户电话号码: 1999999999, 反馈内容如下:<hr><p>不错</p><div/>",
             "Raw":{
                 "name":"小马",
                 "contact": "1999999999",
