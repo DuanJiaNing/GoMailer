@@ -1,20 +1,21 @@
-# GoMailer
+## GoMailer
 轻量电子邮件推送服务(A lightly email sending service for Go)
 
 通过form提交用户输入的数据，GoMailer会将这些数据填入预先定义好的邮件内容模板中，并帮你把内容投递到指定的邮箱。
 也可以选择把邮件暂存在GoMailer中，另外选择时间手动触发投递。
 
 额外的可选配置: 
+
 1. 支持开启reCaptcha验证，避免恶意投递；
 2. 配置请求成功或失败时的重定向地址，相应事件发生时用户将被重定向到指定页面。
 
-# Release Note
+## Release Note
 - v0.1.0
 
-# 使用说明
+## 使用说明
 提供三个接口与GoMailer进行交互，epKey获取接口(epKey唯一标识一个服务接入点)，邮件发送接口，邮件查询接口。
 
-### 1. 获取 epKey
+#### 1. 获取 epKey
 API: `POST /api/shortcut`
 
 将如下json作为 request body, 发送POST请求到`/api/shortcut`接口获取epKey。
@@ -93,7 +94,7 @@ sample网站的管理员，sample网站有两个地方接入了GoMailer的邮件
 
 当接入点配置更新时亦可通过该接口进行更新。
 
-### 2. 在网站中集成
+#### 2. 在网站中集成
 API: `POST /api/mail/send`
 
 将第一步获取到的epKey放入url参数中。
@@ -109,7 +110,7 @@ API: `POST /api/mail/send`
 若第一步选择(或后续进行更新)启用reCaptcha，应将reCaptcha token放入`grecaptcha_token`字段提交到服务器，放在form中或拼接在url都可以。
 reCaptcha的集成可参考[这里](https://www.cnblogs.com/dulinan/p/12033018.html)
 
-### 3. 查询邮件
+#### 3. 查询邮件
 API: GET `/api/mail/list`
 
 请求示例: /api/mail/list?uid=1&pn=1&ps=10
