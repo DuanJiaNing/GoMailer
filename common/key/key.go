@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	EPKeyName             = "epKey"
+	EPKeyName             = "EPKey"
 	ReCaptchaTokenKeyName = "grecaptcha_token"
 )
 

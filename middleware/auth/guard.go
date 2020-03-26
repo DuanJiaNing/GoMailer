@@ -19,7 +19,7 @@ func Guard(next http.Handler) http.Handler {
 		if _, ok := noGuardRequiredAPI[r.URL.Path]; !ok {
 			epk := key.EPKeyFromRequest(r)
 			if utils.IsBlankStr(epk) {
-				http.Error(w, "epKey is required", http.StatusUnauthorized)
+				http.Error(w, "EPKey is required", http.StatusUnauthorized)
 				return
 			}
 			ep, err := endpoint.FindByKey(epk)

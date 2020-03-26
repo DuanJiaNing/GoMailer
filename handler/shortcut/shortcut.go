@@ -106,9 +106,8 @@ func shortcut(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) 
 	}
 
 	return struct {
-		UserId int64
-		AppKey string
-	}{UserId: user.Id, AppKey: ep.Key}, nil
+		EPKey string
+	}{EPKey: ep.Key}, nil
 }
 
 func handleEndPointReceiver(ep *db.Endpoint, u *db.User, ua *db.UserApp, r []*db.Receiver) *app.Error {

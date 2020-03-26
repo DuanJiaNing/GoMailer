@@ -17,12 +17,12 @@
 - [GoMailer - 用 Go 开发的轻量电子邮件推送服务](https://www.jianshu.com/p/158a25a452ca)
 
 ## 使用说明
-提供三个接口与GoMailer进行交互，epKey获取接口(epKey唯一标识一个服务接入点)，邮件发送接口，邮件查询接口。
+提供三个接口与GoMailer进行交互，EPKey获取接口(EPKey唯一标识一个服务接入点)，邮件发送接口，邮件查询接口。
 
-#### 1. 获取 epKey
+#### 1. 获取 EPKey
 API: `POST /api/shortcut`
 
-将如下json作为 request body, 发送POST请求到`/api/shortcut`接口获取epKey。
+将如下json作为 request body, 发送POST请求到`/api/shortcut`接口获取EPKey。
 ```json
 {
   "user": {
@@ -82,14 +82,14 @@ API: `POST /api/shortcut`
 请求成功时的返回结果
 ```text
 {
-  "epKey": "xxx"
+  "EPKey": "xxx"
 }
 ``` 
-epKey唯一标识一个服务接入点，后续请求都需要将该参数拼接在url中(或form中)传递给服务器。借用上面的请求示例进行说明，如有用户A，是
+EPKey唯一标识一个服务接入点，后续请求都需要将该参数拼接在url中(或form中)传递给服务器。借用上面的请求示例进行说明，如有用户A，是
 sample网站的管理员，sample网站有两个地方接入了GoMailer的邮件服务，一个是用户反馈功能，一个是质量投诉功能，那么用户反馈就为一个
-接入点，质量投诉为另一个接入点，epKey不同，拥有独立的配置。
+接入点，质量投诉为另一个接入点，EPKey不同，拥有独立的配置。
 
-可将上述request body保存为文件，后使用register.sh脚本快捷获取epKey:
+可将上述request body保存为文件，后使用register.sh脚本快捷获取EPKey:
 ```shell script
 # http://localhost:8080/api/shortcut 为接口地址，注意进行替换
 # sample.json 为接入点配置文件
@@ -101,9 +101,9 @@ sample网站的管理员，sample网站有两个地方接入了GoMailer的邮件
 #### 2. 在网站中集成
 API: `POST /api/mail/send`
 
-将第一步获取到的epKey放入url参数中。
+将第一步获取到的EPKey放入url参数中。
 ```html
-<form action="http://localhost:6060/api/mail/send?epKey=xxxxx" method="post">
+<form action="http://localhost:6060/api/mail/send?EPKey=xxxxx" method="post">
     <input name="name" placeholder="该怎么称呼您"/><br>
     <input name="contact" placeholder="联系方式(可不填)"/><br>
     <textarea name="content" placeholder="反馈内容"></textarea><br>
