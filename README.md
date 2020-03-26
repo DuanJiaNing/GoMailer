@@ -149,6 +149,10 @@ API: `GET /api/mail/list`
 - DeliveryTime: 邮件投递时间
 - Raw: 对应form中的数据
 
+## Tips
+
+部署时部分依赖需要科学上网才能下载，若条件不允许，可手动解压[`dep.tar.gz`](https://pan.baidu.com/s/1IJard_GsZJid0WhCHjIF_w)(提取码: jgss)到gopath/src目录中
+
 License
 ============
 ```text
