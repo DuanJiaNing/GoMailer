@@ -11,7 +11,7 @@
 可参考 [duanjn.com/#Feedback](http://duanjn.com) 部分的集成效果
 
 ## Release Note
-- v0.1.0
+- [v0.1.0](https://github.com/DuanJiaNing/GoMailer/releases/tag/v0.1.0)
 
 ## 使用说明
 提供三个接口与GoMailer进行交互，epKey获取接口(epKey唯一标识一个服务接入点)，邮件发送接口，邮件查询接口。
