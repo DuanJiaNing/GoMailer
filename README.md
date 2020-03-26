@@ -13,6 +13,9 @@
 ## Release Note
 - [v0.1.0](https://github.com/DuanJiaNing/GoMailer/releases/tag/v0.1.0)
 
+## 相关日志
+- [GoMailer - 用 Go 开发的轻量电子邮件推送服务](https://www.jianshu.com/p/158a25a452ca)
+
 ## 使用说明
 提供三个接口与GoMailer进行交互，epKey获取接口(epKey唯一标识一个服务接入点)，邮件发送接口，邮件查询接口。
 
