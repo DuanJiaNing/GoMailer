@@ -5,6 +5,7 @@ import (
 	"github.com/go-xorm/xorm"
 	"xorm.io/core"
 
+	"GoMailer/app"
 	"GoMailer/conf"
 	"GoMailer/log"
 )
@@ -44,7 +45,7 @@ func prepareEngine() error {
 
 	engine.SetMapper(core.SnakeMapper{})
 
-	engine.ShowSQL(true)
+	engine.ShowSQL(app.IsDevAppServer())
 	engine.ShowExecTime(true)
 
 	return nil
