@@ -8,6 +8,8 @@
 1 支持开启reCaptcha验证，避免恶意投递<br>
 2 配置请求成功或失败时的重定向地址，相应事件发生时用户将被重定向到指定页面
 
+可参考 [duanjn.com/#Feedback](http://duanjn.com) 部分的集成效果
+
 ## Release Note
 - v0.1.0
 
