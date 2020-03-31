@@ -24,8 +24,17 @@ func NewClient() (*xorm.Engine, error) {
 
 	err := engine.Ping()
 	if err != nil {
-		log.Errorf("fail to ping db: %v", err)
-		return nil, err
+		err := engine.Close()
+		if err != nil {
+			return nil, err
+		}
+		log.Warningf("xorm engine closed due to ping failed, will recreate soon.")
+
+		// Recreate engine.
+		err = prepareEngine()
+		if err != nil {
+			return nil, err
+		}
 	}
 	return engine, nil
 }

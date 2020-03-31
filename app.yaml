@@ -11,4 +11,4 @@ cors:
 data-source:
   url: root:xxx@tcp(127.0.0.1:3306)/gomailer
 
-re-captcha-secret:
+re-captcha-secret: xxxxxxxxx
