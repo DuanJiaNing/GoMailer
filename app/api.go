@@ -26,19 +26,22 @@ type Error struct {
 
 func (fn Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	m, e := fn(w, r)
+
+	writeError := func(err *Error) {
+		msg := fmt.Sprintf("handler error, status code: %d, message: %s, underlying err: %v",
+			err.Code, err.Message, err.Error)
+		log.Error(msg)
+		http.Error(w, msg, err.Code)
+	}
 	if e != nil {
-		log.Errorf("handler error, status code: %d, message: %s, underlying err: %v",
-			e.Code, e.Message, e.Error)
-		http.Error(w, e.Message, e.Code)
+		writeError(e)
 		return
 	}
 
 	w.Header().Set(HeaderContentType, MimeApplicationJSON)
 	if err := json.NewEncoder(w).Encode(m); err != nil {
 		e := Errorf(err, "failed to write to http response")
-		log.Errorf("handler error, status code: %d, message: %s, underlying err: %v",
-			e.Code, e.Message, e.Error)
-		http.Error(w, e.Message, e.Code)
+		writeError(e)
 	}
 }
 
