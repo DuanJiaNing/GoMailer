@@ -4,8 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-
-	"GoMailer/conf"
 )
 
 func CORS(r *mux.Router) func(http.Handler) http.Handler {
@@ -14,10 +12,11 @@ func CORS(r *mux.Router) func(http.Handler) http.Handler {
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Access-Control-Allow-Origin", conf.Cors().AllowedOrigins)
-			w.Header().Set("Access-Control-Allow-Methods", conf.Cors().AllowedMethods)
-			w.Header().Set("Access-Control-Allow-Headers", conf.Cors().AllowedHeaders)
-			w.Header().Set("Access-Control-Max-Age", conf.Cors().MaxAge)
+			w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("origin"))
+			w.Header().Set("Access-Control-Allow-Methods", "POST,GET,OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, Accept-Encoding, User-Agent, Accept")
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
+			w.Header().Set("Access-Control-Max-Age", "86400")
 
 			if r.Method == http.MethodOptions {
 				// we only need headers for OPTIONS request, no need to go down the handler chain

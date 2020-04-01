@@ -2,12 +2,6 @@ env: prod
 app:
   port: 6060
 
-cors:
-  allowed-origins: '*'
-  allow-methods: POST,GET,OPTIONS
-  allow-headers: Authorization, Content-Type, Accept-Encoding, User-Agent, Accept
-  max-age: 86400
-
 data-source:
   url: root:xxx@tcp(127.0.0.1:3306)/gomailer
 
