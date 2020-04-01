@@ -36,7 +36,7 @@ var (
 
 func init() {
 	var middleware []mux.MiddlewareFunc
-	middleware = append(middleware, cors.CORS(APIRouter))
 	middleware = append(middleware, auth.Guard)
+	middleware = append(middleware, cors.CORS(APIRouter))
 	APIRouter.Use(middleware...)
 }
