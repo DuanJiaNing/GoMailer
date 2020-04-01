@@ -5,10 +5,10 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"GoMailer/common/key"
 	"GoMailer/handler/endpoint"
 	"GoMailer/handler/userapp"
 	"GoMailer/log"
-	"gowebsitemailer/common/key"
 )
 
 func CORS(r *mux.Router) func(http.Handler) http.Handler {
@@ -18,7 +18,7 @@ func CORS(r *mux.Router) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// No need to verify, already pass the Guard.
-			ak := key.AppKeyFromRequest(r)
+			ak := key.EPKeyFromRequest(r)
 			ep, _ := endpoint.FindByKey(ak)
 			app, err := userapp.FindById(ep.UserAppId)
 			if err != nil {
