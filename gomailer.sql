@@ -120,6 +120,7 @@ CREATE TABLE IF NOT EXISTS `user_app` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `insert_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `user_id` int unsigned NOT NULL,
+  `app_type` varchar(500) DEFAULT NULL,
   `name` varchar(500) NOT NULL,
   `host` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`id`),

@@ -52,6 +52,14 @@ func Create(ua *db.UserApp) (*db.UserApp, error) {
 		return nil, errors.New("name can not be empty")
 	}
 
+	if utils.IsBlankStr(ua.AppType) {
+		ua.AppType = db.AppType_WEB.Name() // Default is WEB app.
+	} else {
+		if db.AppType(ua.AppType) == "" {
+			return nil, errors.New("app type illegal")
+		}
+	}
+
 	client, err := db.NewClient()
 	if err != nil {
 		return nil, err

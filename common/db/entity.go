@@ -7,6 +7,7 @@ import (
 type deliverStrategy string
 type receiverType string
 type mailState string
+type appType string
 
 const (
 	DeliverStrategy_DELIVER_IMMEDIATELY = deliverStrategy("DELIVER_IMMEDIATELY")
@@ -19,6 +20,9 @@ const (
 	ReceiverType_To  = receiverType("To")
 	ReceiverType_Cc  = receiverType("Cc")
 	ReceiverType_Bcc = receiverType("Bcc")
+
+	AppType_WEB     = appType("WEB")
+	AppType_AMP_WEB = appType("AMP_WEB")
 )
 
 var (
@@ -38,6 +42,11 @@ var (
 		"DELIVER_SUCCESS",
 		"DELIVER_FAILED",
 	}
+
+	appTypeName = []string{
+		"WEB",
+		"AMP_WEB",
+	}
 )
 
 type User struct {
@@ -52,7 +61,8 @@ type UserApp struct {
 	Id         int64
 	InsertTime time.Time `xorm:"created"`
 
-	UserId int64
+	UserId  int64
+	AppType string
 
 	Name string
 	Host string
@@ -170,6 +180,16 @@ func MailState(name string) mailState {
 	return ""
 }
 
+func AppType(name string) appType {
+	for _, n := range appTypeName {
+		if name == n {
+			return appType(name)
+		}
+	}
+
+	return ""
+}
+
 func (r receiverType) Name() string {
 	return string(r)
 }
@@ -179,5 +199,9 @@ func (r deliverStrategy) Name() string {
 }
 
 func (r mailState) Name() string {
+	return string(r)
+}
+
+func (r appType) Name() string {
 	return string(r)
 }

@@ -31,7 +31,8 @@ API: `POST /api/shortcut`
   },
   "app": {
     "name": "sample",
-    "host": "sample.com"
+    "host": "sample.com",
+    "appType": "WEB"
   },
   "endpoint": {
     "name": "sample用户反馈",
@@ -73,6 +74,7 @@ API: `POST /api/shortcut`
 字段说明:
 - dialer: 邮件发件人配置，需到自己的邮箱网页端自行获取，参考[QQ邮箱的获取方式](https://service.mail.qq.com/cgi-bin/help?subtype=1&id=28&no=1001256)
 - dialer.name: 发件人名称
+- app.appType: 目前支持标准web应用和amp web应用，amp的重定向使用自定义的header，需要不同的逻辑处理。标准web: WEB, AMP_WEB: amp web应用
 - receiver: 收件人配置，To: 接收人，Cc: 抄送人，Bcc: 密送人
 - template: 邮件内容模板配置，类似{{contact}}的部分最终会被form中相应字段值替换
 - preference.deliverStrategy: 邮件投递策略: DELIVER_IMMEDIATELY: 立即发送，STAGING: 保存但不发送

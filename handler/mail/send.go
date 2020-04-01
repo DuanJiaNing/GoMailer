@@ -11,6 +11,7 @@ import (
 	"GoMailer/common/utils"
 	"GoMailer/handler"
 	"GoMailer/handler/endpoint"
+	"GoMailer/handler/userapp"
 	"GoMailer/log"
 )
 
@@ -31,53 +32,67 @@ func send(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) {
 
 	raw, err := parseForm(r)
 	if err != nil {
-		sendRedirect(w, ep.Id, err)
+		setupRedirectHeader(w, ep, err, r)
 		return nil, app.Errorf(err, "got error when parse form")
 	}
 	mail, err := handleMail(ep.Id, raw, key.ReCaptchaKeyFromRequest(r))
 	if mail != nil {
 		_, err := Create(ep.UserId, mail)
 		if err != nil {
-			sendRedirect(w, ep.Id, err)
+			setupRedirectHeader(w, ep, err, r)
 			return nil, app.Errorf(err, "fail to store mail")
 		}
 	}
 	if err != nil {
-		sendRedirect(w, ep.Id, err)
+		setupRedirectHeader(w, ep, err, r)
 		return nil, app.Errorf(err, "failed to deliver mail")
 	}
 
-	sendRedirect(w, ep.Id, nil)
+	setupRedirectHeader(w, ep, nil, r)
 	return nil, nil
 }
 
-func sendRedirect(w http.ResponseWriter, endpointId int64, err error) {
-	client, ierr := db.NewClient()
-	if ierr != nil {
-		http.Error(w, ierr.Error(), http.StatusInternalServerError)
-		log.Errorf("got err when set up redirect header: %v", ierr)
+func setupRedirectHeader(w http.ResponseWriter, ep *db.Endpoint, oerr error, r *http.Request) {
+	client, err := db.NewClient()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Errorf("got err when set up redirect header: %v", err)
 		return
 	}
 
-	ep := &db.EndpointPreference{}
-	get, ierr := client.Where("endpoint_id = ?", endpointId).Get(ep)
-	if ierr != nil {
-		http.Error(w, ierr.Error(), http.StatusInternalServerError)
-		log.Errorf("got err when set up redirect header: %v", ierr)
+	epp := &db.EndpointPreference{}
+	get, err := client.Where("endpoint_id = ?", ep.Id).Get(epp)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Errorf("got err when set up redirect header: %v", err)
 		return
 	}
 	if !get {
 		// No preference yet, ignore.
 		return
 	}
-
-	if err != nil && !utils.IsBlankStr(ep.FailRedirect) {
-		w.WriteHeader(http.StatusFound)
-		w.Header().Set("Location", ep.FailRedirect+"?err="+err.Error())
+	ua, err := userapp.FindById(ep.UserAppId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Errorf("got err when set up redirect header: %v", err)
+		return
 	}
-	if err == nil && !utils.IsBlankStr(ep.SuccessRedirect) {
+
+	setup := func(addr string) {
+		if ua.AppType == db.AppType_AMP_WEB.Name() {
+			w.Header().Set("AMP-Redirect-To", addr)
+			w.Header().Set("Access-Control-Expose-Headers", "AMP-Access-Control-Allow-Source-Origin, AMP-Redirect-To")
+			return
+		}
+
 		w.WriteHeader(http.StatusFound)
-		w.Header().Set("Location", ep.SuccessRedirect)
+		w.Header().Set("Location", addr)
+	}
+	if oerr != nil && !utils.IsBlankStr(epp.FailRedirect) {
+		setup(epp.FailRedirect + "?err=" + oerr.Error())
+	}
+	if oerr == nil && !utils.IsBlankStr(epp.SuccessRedirect) {
+		setup(epp.SuccessRedirect)
 	}
 }
 
