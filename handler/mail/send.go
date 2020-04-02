@@ -21,16 +21,13 @@ func init() {
 }
 
 func send(w http.ResponseWriter, r *http.Request) (interface{}, *app.Error) {
-	if err := r.ParseForm(); err != nil {
-		return nil, app.Errorf(err, "failed to parse form")
-	}
 	epk := key.EPKeyFromRequest(r)
 	ep, err := endpoint.FindByKey(epk)
 	if err != nil {
 		return nil, app.Errorf(err, "failed to find endpoint by key")
 	}
 
-	raw, err := parseForm(r)
+	raw, err := parseForm(r, ep)
 	if err != nil {
 		setupRedirectHeader(w, ep, err, r)
 		return nil, app.Errorf(err, "got error when parse form")
@@ -96,7 +93,23 @@ func setupRedirectHeader(w http.ResponseWriter, ep *db.Endpoint, oerr error, r *
 	}
 }
 
-func parseForm(r *http.Request) (map[string]string, error) {
+func parseForm(r *http.Request, ep *db.Endpoint) (map[string]string, error) {
+	ua, err := userapp.FindById(ep.UserAppId)
+	if err != nil {
+		return nil, errors.New("failed to find user app")
+	}
+
+	const defaultMaxMemory = 5 << 20         // 5 MB
+	if ua.AppType == db.AppType_WEB.Name() { // application/x-www-form-urlencoded
+		if err = r.ParseForm(); err != nil {
+			return nil, errors.New("failed to parse form")
+		}
+	} else { // multipart/form-data
+		if err = r.ParseMultipartForm(defaultMaxMemory); err != nil {
+			return nil, errors.New("failed to parse multipart form")
+		}
+	}
+
 	data := make(map[string]string)
 	allBlank := true
 	for k, vs := range r.Form {
