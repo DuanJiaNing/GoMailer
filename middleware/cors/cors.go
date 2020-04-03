@@ -23,9 +23,9 @@ func CORS(r *mux.Router) func(http.Handler) http.Handler {
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			allowOrigin := "*"
-			if _, ok := freeAPI[r.URL.Path]; !ok {
-				// No need to verify, already pass the Guard.
+			if _, ok := freeAPI[r.URL.Path]; ok {
+				writeAllowOrigin(w, "*")
+			} else {
 				ak := key.EPKeyFromRequest(r)
 				ep, err := endpoint.FindByKey(ak)
 				if err != nil {
@@ -39,14 +39,13 @@ func CORS(r *mux.Router) func(http.Handler) http.Handler {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return
 				}
-				allowOrigin = app.Host
+				allowOrigin := app.Host
+				if r.Header.Get("Origin") != allowOrigin {
+					w.WriteHeader(http.StatusForbidden)
+					return
+				}
+				writeAllowOrigin(w, allowOrigin)
 			}
-
-			w.Header().Set("Access-Control-Allow-Origin", allowOrigin)
-			w.Header().Set("Access-Control-Allow-Methods", "POST,GET,OPTIONS")
-			w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, Accept-Encoding, User-Agent, Accept")
-			w.Header().Set("Access-Control-Allow-Credentials", "true")
-			w.Header().Set("Access-Control-Max-Age", "86400")
 
 			if r.Method == http.MethodOptions {
 				// we only need headers for OPTIONS request, no need to go down the handler chain
@@ -56,4 +55,12 @@ func CORS(r *mux.Router) func(http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+func writeAllowOrigin(w http.ResponseWriter, allowOrigin string) {
+	w.Header().Set("Access-Control-Allow-Origin", allowOrigin)
+	w.Header().Set("Access-Control-Allow-Methods", "POST,GET,OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, Accept-Encoding, User-Agent, Accept")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Access-Control-Max-Age", "86400")
 }
