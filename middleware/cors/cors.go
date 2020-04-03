@@ -13,7 +13,8 @@ import (
 
 var (
 	freeAPI = map[string]struct{}{
-		"/api/shortcut": {},
+		"/api/shortcut":  {},
+		"/api/mail/list": {},
 	}
 )
 
