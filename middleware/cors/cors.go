@@ -2,10 +2,12 @@ package cors
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/mux"
 
 	"GoMailer/common/key"
+	"GoMailer/common/utils"
 	"GoMailer/handler/endpoint"
 	"GoMailer/handler/userapp"
 	"GoMailer/log"
@@ -40,12 +42,13 @@ func CORS(r *mux.Router) func(http.Handler) http.Handler {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return
 				}
-				allowOrigin := app.Host
-				if r.Header.Get("Origin") != allowOrigin {
+
+				origin := r.Header.Get("Origin")
+				if !isAllowed(app.Host, origin) {
 					w.WriteHeader(http.StatusForbidden)
 					return
 				}
-				writeAllowOrigin(w, allowOrigin)
+				writeAllowOrigin(w, origin)
 			}
 
 			if r.Method == http.MethodOptions {
@@ -56,6 +59,23 @@ func CORS(r *mux.Router) func(http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+func isAllowed(hosts string, origin string) bool {
+	if utils.IsBlankStr(hosts) || utils.IsBlankStr(origin) {
+		return false
+	}
+
+	hosts = strings.TrimSpace(hosts)
+	hosts = strings.ReplaceAll(hosts, " ", "")
+	parts := strings.Split(hosts, ",")
+	for _, a := range parts {
+		if a == origin {
+			return true
+		}
+	}
+
+	return false
 }
 
 func writeAllowOrigin(w http.ResponseWriter, allowOrigin string) {
